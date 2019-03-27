@@ -1,0 +1,280 @@
+@model IEnumerable<Registration.Models.EmployeeDetailsModel>
+@using System.Text;
+@using System.IO;
+@using System.Configuration;
+@{
+    ViewBag.Title = "UpdateEmployeeDetails";
+    Layout = null;
+}
+
+<h2>UpdateEmployeeDetails</h2>
+
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js" type="text/javascript"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js" type="text/javascript"></script>
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="Stylesheet" type="text/css" />
+
+@Html.ActionLink("Back", "EmployeeDetails")
+<br />
+<br />
+@using (Html.BeginForm("UpdateEmployeeDetails", "Registration", FormMethod.Post, new { @id = "employeeform", enctype = "multipart/form-data" }))
+{
+    foreach (var items in Model)
+    {
+        string[] SkillSetList = @items.SkillSetName.Split(',');
+        string lstValue = "";
+        <table>
+            <tr>@Html.Hidden("RegistrationID", @items.RegistrationID, new { @id = "hdnregid" })</tr>
+            <tr>
+                <td>@Html.Label("UserName", new { @id = "lblusername", style = "color:black" })</td>
+                <td>@Html.TextBox("UserName", @items.UserName, new { @id = "UserName" })</td>
+            </tr>
+            <tr>
+                <td>@Html.Label("PassWord", new { @id = "lblpswd", style = "color:black" })</td>
+                <td>@Html.TextBox("PassWord", @items.PassWord, new { @id = "PassWord" })</td>
+            <tr>
+                <td>@Html.Label("ConfirmPassWord", new { @id = "lblcnfrmpswd", style = "color:black" })</td>
+                <td>@Html.TextBox("ConfirmPassWord", @items.ConfirmPassWord, new { @id = "ConfirmPassWord" })</td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.Label("CountryName", new { @id = "lblcountryname", style = "color:black" })
+                    <select class="form-control" id="CountryName" name="CountryName">
+
+                        @foreach (var selectLists in ViewBag.Country)
+                        {
+                            if (@items.CountryName == selectLists.Value)
+                            {
+                                <option value="@items.CountryName" selected="selected">@items.CountryName</option>
+                            }
+                            else
+                            {
+                                <option value="@selectLists.Value">@selectLists.Text</option>
+                            }
+                        }
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.Label("StateName", new { @id = "lblstatename", style = "color:black" })
+                <select class="form-control" id="StateName" name="StateName">
+
+                    @foreach (var selectLists in ViewBag.State)
+                    {
+                        if (@items.StateName == selectLists.Value)
+                        {
+                            <option value="@items.StateName" selected="selected">@items.StateName</option>
+                        }
+                        else
+                        {
+                            <option value="@selectLists.Value">@selectLists.Text</option>
+                        }
+                    }
+                </select>
+            </td>
+
+        </tr>
+        <tr>
+            <td>
+                @Html.Label("CityName", new { @id = "lblcityname", style = "color:black" })
+            <select class="form-control" id="CityName" name="CityName">
+
+                @foreach (var selectLists in ViewBag.City)
+                {
+                    if (@items.CityName == selectLists.Value)
+                    {
+                        <option value="@items.CityName" selected="selected">@items.CityName</option>
+                    }
+                    else
+                    {
+                        <option value="@selectLists.Value">@selectLists.Text</option>
+                    }
+                }
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>@Html.Label("Skill Set Name", new { @id = "lblskill", style = "color:black" })</td>
+        <td style="color: black">
+            @foreach (var skill in ViewBag.Skillset)
+            {
+                lstValue = skill.Text;
+
+                if (SkillSetList.Length > 0)
+                {
+                    if (SkillSetList.Contains(lstValue))
+                    {
+                        <input type="checkbox" id=@lstValue name="SkillSetName" value=@lstValue checked />@lstValue
+                    }
+                    else
+                    {
+                        <input type="checkbox" id=@lstValue name="SkillSetName" value=@lstValue />@lstValue
+                    }
+                }
+            }
+        </td>
+    </tr>
+    <tr>
+        <td>@Html.Label("DateOfBirth", new { @id = "lbldob", style = "color:black" })</td>
+        <td>@Html.TextBox("DateOfBirth", @items.DateOfBirth, new { @id = "DateOfBirth", @required = "required" })</td>
+    </tr>
+    <tr>
+        <td>
+            @Html.Label("Sex", new { @id = "lblsex", style = "color:black" })
+        @if (items.Sex == "Male")
+        {
+            @Html.RadioButton("Sex", "Male", true, new { @id = "rdmale", @checked = "checked" })
+            @Html.Label("Male", new { @id = "lblmale", style = "color:black" })
+            @Html.RadioButton("Sex", "FeMale", false, new { @id = "rdfemale" })
+            @Html.Label("FeMale", new { @id = "lblfemale", style = "color:black" })
+        }
+        else
+        {
+            @Html.RadioButton("Sex", "Male", false, new { @id = "rdmale" })
+            @Html.Label("Male", new { @id = "lblmale", style = "color:black" })
+            @Html.RadioButton("Sex", "FeMale", true, new { @id = "rdfemale", @checked = "checked" })
+            @Html.Label("FeMale", new { @id = "lblfemale", style = "color:black" })
+        }
+    </td>
+</tr>
+<tr>
+    <td>@Html.Label("MobileNo", new { @id = "lblmobno", style = "color:black" })</td>
+    <td>@Html.TextBox("MobileNo", @items.MobileNo, new { @id = "MobileNo", @maxlength = "10", @required = "required", @pattern = @"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", @title = "please enter valid mobile number" })</td>
+</tr>
+<tr>
+    <td>@Html.Label("EmailID", new { @id = "lblemail", style = "color:black" })</td>
+    <td>@Html.TextBox("EmailID", @items.EmailID, new { @id = "EmailID", @pattern = "^[a-zA-Z0-9_\\.-]+@([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$", @title = "please enter valid email address" })</td>
+</tr>
+<tr>
+    <td>
+        @Html.Label("Current Status", new { @id = "lblcursts", style = "color:black" })
+        @if (items.CurrentStatus == "Active")
+        {
+            @Html.RadioButton("CurrentStatus", "Active", true, new { @id = "rdact", @checked = "checked" })
+            @Html.Label("Active", new { @id = "lblact", style = "color:black" })
+            @Html.RadioButton("CurrentStatus", "InActive", false, new { @id = "rdinact" })
+            @Html.Label("InActive", new { @id = "lblInact", style = "color:black" })
+        }
+        else
+        {
+            @Html.RadioButton("CurrentStatus", "Active", false, new { @id = "rdact" })
+            @Html.Label("Active", new { @id = "lblact", style = "color:black" })
+            @Html.RadioButton("CurrentStatus", "InActive", true, new { @id = "rdinact", @checked = "checked" })
+            @Html.Label("InActive", new { @id = "lblInact", style = "color:black" })
+        }
+    </td>
+</tr>
+<tr>
+    <td>@Html.Label("Description/Comments", new { @id = "lblDesc", style = "color:black" })</td>
+    <td>@Html.TextArea("Description_Comments", @items.Description_Comments, new { @id = "Description_Comments", @required = "required" })</td>
+</tr>
+<tr>
+    <td style="color: black; ">
+        @Html.Label("Attachment", new { @id = "lblattach", style = "color:black" })
+        <input type="file" name="ImagePath" />
+        <img alt="@items.ImgName" src="@Url.Content(items.Attachment)" width="25" height="25" />
+    </td>
+</tr>
+</table>
+    <br />
+    <input type="submit" name="save" id="save" value="Update" />
+    }
+}
+
+@*<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js" type="text/javascript"></script>*@
+<script src="~/Js/jquery.js"></script>
+<script src="~/Js/jquery.validate.js"></script>
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="Stylesheet" type="text/css" />
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js" type="text/javascript"></script>
+
+
+
+<script>
+    $(document).ready(function () {
+        debugger;
+        //$.validator.setDefaults({
+        //    submitHandler: function () {
+        //        alert("Submitted");
+        //    }
+        //});
+        $("#employeeform").validate({
+            rules: {
+                UserName: "required",
+                PassWord: {
+                    required: true,
+                    minlength: 6
+                },
+                ConfirmPassWord: {
+                    required: true,
+                    minlength: 6,
+                    equalTo: "#PassWord"
+                },
+                DateOfBirth: {
+                    required: true,
+                    date: true
+                },
+                MobileNo: {
+                    required: true,
+                    digits: true,
+                    minlength: 10,
+                    maxlength: 10,
+                },
+                EmailID: {
+                    required: true,
+                    email: true
+                },
+                CountryName: "required",
+                StateName: "required",
+                CityName: "required",
+                Description_Comments: "required",
+            },
+            messages: {
+                UserName: "please enter the username",
+                PassWord: {
+                    required: "please enter the password",
+                    minlength: "length must be 6"
+                },
+                ConfirmPassWord: {
+                    required: "please enter the confirm-password",
+                    minlength: "length must be 6",
+                    equalTo: "password can't matched"
+                },
+                DateOfBirth: {
+                    required: "please enter the D.O.B",
+                    date: "type proper date format"
+                },
+                MobileNo: {
+                    required: "please enter the mobile number",
+                    digits: "enter numeric values only",
+                    minlength: "length must be 10",
+                    maxlength: "length is more than 10"
+                },
+                EmailID: {
+                    required: "please enter the email address",
+                    email: "your email is inavlid"
+                },
+                CountryName: "please select the country name",
+                StateName: "please select the state name",
+                CityName: "please select the city name",
+                Description_Comments: "please enter the comments",
+            }
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $("#txtdob").datepicker();
+    });
+</script>
+
+
+<style>
+    .error{
+        color:red;
+    }
+    #employeeform {
+        background-color: white;
+    }
+</style>
