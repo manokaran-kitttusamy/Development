@@ -1,0 +1,892 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Data;
+using System.Data.SqlClient;
+using System.ComponentModel.DataAnnotations;
+using Registration.Models;
+using Registration.DAL;
+using Registration.RegistrationDataObjects;
+using System.IO;
+using System.Threading.Tasks;
+using System.Net.Mail;
+using System.Net;
+using System.Configuration;
+using WebMatrix.WebData;
+
+
+namespace Registration.Controllers
+{
+    public class RegistrationController : Controller
+    {
+                
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+
+        #region State loading based on Country
+        public JsonResult LoadStateBasedonCountry(string Id)
+        {
+            long contryId = Convert.ToInt64(Id);
+            List<StateModel> state = new List<StateModel>();
+            state = RegistrationData.GetStateByCountryId(contryId);
+            return Json(state, JsonRequestBehavior.AllowGet);
+        }
+        #endregion
+
+        #region City loading based on State
+        public JsonResult LoadCityBasedonState(string Id)
+        {
+            long cityId = Convert.ToInt64(Id);
+            List<CityModel> city = new List<CityModel>();
+            city = RegistrationData.GetCityByStateId(cityId);
+            return Json(city, JsonRequestBehavior.AllowGet);
+        }
+        #endregion
+
+        #region Country
+        public ActionResult Country()
+        {
+            try
+            {
+                List<CountryModel> country = new List<CountryModel>();
+                country = RegistrationData.GetAllCountry();
+                return View(country);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult Country(CountryModel country)
+        {
+            try
+            {
+                RegistrationData.AddCountry(country);
+                ModelState.Clear();
+                return RedirectToAction("Country");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateCountry(long id)
+        {
+            try
+            {
+                List<CountryModel> country = new List<CountryModel>();
+                country = RegistrationData.GetCountry(id);
+                return View(country);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateCountry(CountryModel country)
+        {
+            try
+            {
+                RegistrationData.UpdateCountry(country);
+                return RedirectToAction("Country");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public ActionResult DeleteCountry(long id)
+        {
+            try
+            {
+                RegistrationData.DeleteCountry(id);
+                return RedirectToAction("Country");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        #endregion Country
+        #region State
+        public ActionResult State()
+        {
+            try
+            {
+                ViewBag.Country = RegistrationData.GetCountries();
+                List<StateModel> state = new List<StateModel>();
+                state = RegistrationData.GetAllState();
+                if (state.Count > 0)
+                {
+                    foreach (var items in state)
+                    {
+
+                        items.CountryName = RegistrationData.GetCountryNamefromID(items.CountryID);
+                    }
+                }
+                return View(state);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult State(StateModel State)
+        {
+            try
+            {
+                ViewBag.Country = RegistrationData.GetCountriesFromState();
+
+                int CountryID = RegistrationData.GetIDFromCountryName(State.CountryName);
+                State.CountryID = CountryID;
+
+                RegistrationData.AddState(State);
+                ModelState.Clear();
+                return RedirectToAction("State");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public JsonResult GetState(long Id)
+        {
+            List<StateModel> state = new List<StateModel>();
+            state = RegistrationData.GetStateByCountryId(Id);
+            return Json(state, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult UpdateState(long id)
+        {
+            try
+            {
+
+                ViewBag.Country = RegistrationData.GetCountries();
+                List<StateModel> state = new List<StateModel>();
+                state = RegistrationData.GetState(id);
+                if (state.Count > 0)
+                {
+                    foreach (var items in state)
+                    {
+
+                        items.CountryName = RegistrationData.GetCountryNamefromID(items.CountryID);
+                    }
+                }
+                return View(state);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateState(StateModel state)
+        {
+            try
+            {
+
+                int CountryID = RegistrationData.GetIDFromCountryName(state.CountryName);
+                state.CountryID = CountryID;
+
+                RegistrationData.UpdateState(state);
+                return RedirectToAction("state");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public ActionResult DeleteState(long id)
+        {
+            try
+            {
+                RegistrationData.DeleteState(id);
+                return RedirectToAction("state");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion State
+        #region City
+        public ActionResult City()
+        {
+            try
+            {
+
+                ViewBag.Country = RegistrationData.GetCountries();
+                ViewBag.State = RegistrationData.GetStates();
+                List<CityModel> City = new List<CityModel>();
+                City = RegistrationData.GetAllCity();
+                if (City.Count > 0)
+                {
+                    foreach (var items in City)
+                    {
+                        items.CountryName = RegistrationData.GetCountryNamefromID(items.CountryID);
+                        items.StateName = RegistrationData.GetStateNamefromID(items.StateID);
+                    }
+                }
+                return View(City);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult City(CityModel City)
+        {
+            try
+            {
+
+                ViewBag.Country = RegistrationData.GetCountriesFromState();
+                ViewBag.State = RegistrationData.GetStatesFromCity();
+
+                int CountryID = RegistrationData.GetIDFromCountryName(City.CountryName);
+                City.CountryID = CountryID;
+
+                int StateID = RegistrationData.GetIDFromStateName(City.StateName);
+                City.StateID = StateID;
+
+                RegistrationData.AddCity(City);
+                ModelState.Clear();
+                return RedirectToAction("City");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public JsonResult GetCity(long Id)
+        {
+            List<CityModel> city = new List<CityModel>();
+            city = RegistrationData.GetCityByStateId(Id);
+            return Json(city, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult UpdateCity(long id)
+        {
+            try
+            {
+
+                ViewBag.State = RegistrationData.GetStates();
+                List<CityModel> City = new List<CityModel>();
+                City = RegistrationData.GetCity(id);
+                if (City.Count > 0)
+                {
+                    foreach (var items in City)
+                    {
+
+                        items.StateName = RegistrationData.GetStateNamefromID(items.StateID);
+                    }
+                }
+                return View(City);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateCity(CityModel City)
+        {
+            try
+            {
+                int StateID = RegistrationData.GetIDFromStateName(City.StateName);
+                City.StateID = StateID;
+
+                RegistrationData.UpdateCity(City);
+                return RedirectToAction("City");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public ActionResult DeleteCity(long id)
+        {
+            try
+            {
+                RegistrationData.DeleteCity(id);
+                return RedirectToAction("City");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion City
+        #region SkillSet
+        public ActionResult SkillSet()
+        {
+            try
+            {
+                List<SkillSetModel> skill = new List<SkillSetModel>();
+                skill = RegistrationData.GetAllSkillSet();
+                return View(skill);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult SkillSet(SkillSetModel skill)
+        {
+            try
+            {
+                RegistrationData.AddSkill(skill);
+                ModelState.Clear();
+                return RedirectToAction("SkillSet");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateSkillSet(long id)
+        {
+            try
+            {
+                List<SkillSetModel> skill = new List<SkillSetModel>();
+                skill = RegistrationData.GetSkill(id);
+                return View(skill);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateSkillSet(SkillSetModel skill)
+        {
+            try
+            {
+                RegistrationData.UpdateSkill(skill);
+                return RedirectToAction("SkillSet");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public ActionResult DeleteSkillSet(long id)
+        {
+            try
+            {
+                RegistrationData.DeleteSkill(id);
+                return RedirectToAction("SkillSet");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion SkillSet
+        #region EmployeeDetails
+        public ActionResult EmployeeDetails()
+        {
+            try
+            {
+
+                ViewBag.Country = RegistrationData.GetCountries();
+                ViewBag.State = RegistrationData.GetStates();
+                ViewBag.City = RegistrationData.GetCities();
+                ViewBag.Skillset = RegistrationData.GetSkillSet();
+                List<EmployeeDetailsModel> employee = new List<EmployeeDetailsModel>();
+                employee = RegistrationData.GetAllEmployees();
+                if (employee.Count > 0)
+                {
+                    foreach (var items in employee)
+                    {
+
+                        items.CountryName = RegistrationData.GetCountryNamefromID(items.CountryID);
+                        items.StateName = RegistrationData.GetStateNamefromID(items.StateID);
+                        items.CityName = RegistrationData.GetCityNamefromID(items.CityID);
+                    }
+                }
+                return View(employee);
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+        [HttpPost]
+        public ActionResult EmployeeDetails(EmployeeDetailsModel employee, string[] SkillSetName, HttpPostedFileBase ImagePath)
+        {
+            try
+            {
+
+                string Skill = string.Join(",", SkillSetName);
+                employee.SkillSetName = Skill;
+
+                ViewBag.Country = RegistrationData.GetCountriesFromState();
+                ViewBag.State = RegistrationData.GetStatesFromCity();
+                ViewBag.City = RegistrationData.GetCities();
+                ViewBag.Skillset = RegistrationData.GetSkillSet();
+
+                string fileName = Path.GetFileName(ImagePath.FileName);
+                string paths = Server.MapPath("~/Uploads/");
+
+                if (!Directory.Exists(paths))
+                {
+                    Directory.CreateDirectory(paths);
+                }
+
+                paths = "~/Uploads/" + fileName;
+
+                ImagePath.SaveAs(Server.MapPath(paths));
+
+                employee.ImgName = fileName;
+                employee.Attachment = paths;
+
+                int CountryID = RegistrationData.GetIDFromCountryName(employee.CountryName);
+                employee.CountryID = CountryID;
+                int StateID = RegistrationData.GetIDFromStateName(employee.StateName);
+                employee.StateID = StateID;
+                int CityID = RegistrationData.GetIDFromCityName(employee.CityName);
+                employee.CityID = CityID;
+
+                RegistrationData.AddEmployee(employee);
+                ModelState.Clear();
+                return RedirectToAction("EmployeeDetails");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+
+        public ActionResult UpdateEmployeeDetails(long id)
+        {
+            try
+            {
+                
+                
+                ViewBag.Country = RegistrationData.GetCountries();
+                ViewBag.State = RegistrationData.GetStates();
+                ViewBag.City = RegistrationData.GetCities();
+                ViewBag.Skillset = RegistrationData.GetSkillSet();
+                List<EmployeeDetailsModel> employee = new List<EmployeeDetailsModel>();
+                employee = RegistrationData.GetEmployee(id);
+                if (employee.Count > 0)
+                {
+                    foreach (var items in employee)
+                    {
+
+                        items.CountryName = RegistrationData.GetCountryNamefromID(items.CountryID);
+                        items.StateName = RegistrationData.GetStateNamefromID(items.StateID);
+                        items.CityName = RegistrationData.GetCityNamefromID(items.CityID);
+                    }
+                }
+                return View(employee);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+
+        public ActionResult UpdateEmployeeDetails(EmployeeDetailsModel employee, string[] SkillSetName, HttpPostedFileBase ImagePath)
+        {
+            try
+            {
+
+                string Skill = string.Join(",", SkillSetName);
+                employee.SkillSetName = Skill;
+
+                ViewBag.Country = RegistrationData.GetCountries();
+                ViewBag.State = RegistrationData.GetStates();
+                ViewBag.City = RegistrationData.GetCities();
+                ViewBag.Skillset = RegistrationData.GetSkillSet();
+
+                string fileName = Path.GetFileName(ImagePath.FileName);
+                string paths = Server.MapPath("~/Uploads/");
+
+                if (!Directory.Exists(paths))
+                {
+                    Directory.CreateDirectory(paths);
+                }
+
+                paths = "~/Uploads/" + fileName;
+
+                ImagePath.SaveAs(Server.MapPath(paths));
+
+                employee.ImgName = fileName;
+                employee.Attachment = paths;
+
+                int CountryID = RegistrationData.GetIDFromCountryName(employee.CountryName);
+                employee.CountryID = CountryID;
+                int StateID = RegistrationData.GetIDFromStateName(employee.StateName);
+                employee.StateID = StateID;
+                int CityID = RegistrationData.GetIDFromCityName(employee.CityName);
+                employee.CityID = CityID;
+
+                RegistrationData.UpdateEmployee(employee);
+                ModelState.Clear();
+                return RedirectToAction("EmployeeDetails");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+        public ActionResult DeleteEmployeeDetails(long id)
+        {
+            try
+            {
+                RegistrationData.DeleteEmployee(id);
+                return RedirectToAction("EmployeeDetails");
+
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+
+        }
+
+        #endregion EmployeeDetails
+        #region EmployeeLogin
+        public ActionResult EmployeeLogin()
+        {
+            try
+            {
+                return View();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult EmployeeLogin(EmployeeDetailsModel employee)
+        {
+            using (StudentRegistrationEntities db = new StudentRegistrationEntities())
+                try
+                {
+
+                    var userdetails = db.tbl_Registration.Where(i => i.UserName == employee.UserName && i.PassWord == employee.PassWord).FirstOrDefault();
+
+                    if (userdetails == null)
+                    {
+                        employee.LoginErrorMessage = "wrong username and password";
+                        return RedirectToAction("EmployeeLogin");
+                    }
+                    else
+                    {
+                        Session["EmployeeID"] = employee.RegistrationID;
+                        Session["UserName"] = employee.UserName;
+                        return RedirectToAction("EmployeeDetails");
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    throw ex;
+                }
+        }
+
+        public ActionResult NewEmployee()
+        {
+            try
+            {
+
+                ViewBag.Country = RegistrationData.GetCountriesFromState();
+                ViewBag.State = RegistrationData.GetStatesFromCity();
+                ViewBag.City = RegistrationData.GetCities();
+                ViewBag.Skillset = RegistrationData.GetSkillSet();
+                List<EmployeeDetailsModel> employee = new List<EmployeeDetailsModel>();
+                employee = RegistrationData.GetAllEmployees();
+                if (employee.Count > 0)
+                {
+                    foreach (var items in employee)
+                    {
+
+                        items.CountryName = RegistrationData.GetCountryNamefromID(items.CountryID);
+                        items.StateName = RegistrationData.GetStateNamefromID(items.StateID);
+                        items.CityName = RegistrationData.GetCityNamefromID(items.CityID);
+                    }
+                }
+                return View(employee);
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+        [HttpPost]
+        public ActionResult NewEmployee(EmployeeDetailsModel employee, string[] SkillSetName, HttpPostedFileBase ImagePath)
+        {
+            try
+            {
+
+
+                string Skill = string.Join(",", SkillSetName);
+                employee.SkillSetName = Skill;
+
+                ViewBag.Country = RegistrationData.GetCountries();
+                ViewBag.State = RegistrationData.GetStates();
+                ViewBag.City = RegistrationData.GetCities();
+                ViewBag.Skillset = RegistrationData.GetSkillSet();
+
+                string fileName = Path.GetFileName(ImagePath.FileName);
+                string paths = Server.MapPath("~/Uploads/");
+
+                if (!Directory.Exists(paths))
+                {
+                    Directory.CreateDirectory(paths);
+                }
+
+                paths = "~/Uploads/" + fileName;
+
+                ImagePath.SaveAs(Server.MapPath(paths));
+
+                employee.ImgName = fileName;
+                employee.Attachment = paths;
+
+                int CountryID = RegistrationData.GetIDFromCountryName(employee.CountryName);
+                employee.CountryID = CountryID;
+                int StateID = RegistrationData.GetIDFromStateName(employee.StateName);
+                employee.StateID = StateID;
+                int CityID = RegistrationData.GetIDFromCityName(employee.CityName);
+                employee.CityID = CityID;
+
+                RegistrationData.AddEmployee(employee);
+                ModelState.Clear();
+                return RedirectToAction("NewEmployee");
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion EmployeeLogin
+        #region employeelogout
+        public ActionResult EmployeeLogout()
+        {
+            try
+            {
+                Session.Abandon();
+                return RedirectToAction("EmployeeLogin");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion employeelogout
+        #region forgotpassword
+        [NonAction]
+        public ActionResult SendVerificationLinkEmail(string EmailID, string ActivationCode,string EmailFor="VerifyAccount")
+        {
+            //var token = WebSecurity.GeneratePasswordResetToken(EmailID);
+
+            if (EmailID == null)
+            {
+                // If user does not exist or is not confirmed. 
+                return View();
+            }
+            else
+            {
+                //Create URL with above token 
+                var lnkHref = "<a href='" + Url.Action("ForgotPassWord", "Registration", new { email = EmailID}, "http") + "'>Reset Password</a>";
+
+                //HTML Template for Send email  
+                string subject = "Your password changed ";
+                string body = "<b>Please find the Password Reset Link. </b><br/>" + lnkHref;
+
+
+                SmtpClient server = new SmtpClient();
+                server.Host = "smtp.gmail.com";
+                server.Credentials = new NetworkCredential("manokarthick010@gmail.com", "kskma010");
+                server.Port =Convert.ToInt32(587);
+                server.DeliveryMethod = SmtpDeliveryMethod.Network;
+                server.UseDefaultCredentials = false;
+
+                MailMessage email = new MailMessage();
+                email.From = new MailAddress("manokarthick010@gmail.com");
+                email.To.Add(EmailID);
+                email.Subject = subject;
+                email.Body = body;
+                try
+                {
+                    server.Send(email);
+                }
+                catch (SmtpFailedRecipientException error)
+                {
+                    throw error;
+                }
+
+                return View();
+            }  
+  
+
+
+            //var verifyUrl = "/User/"+EmailFor+"" + ActivationCode;
+            //var link = Request.Url.AbsoluteUri.Replace(Request.Url.PathAndQuery,verifyUrl);
+
+            //var fromEmail = new MailAddress("manokarthick010@gmail.com", "Good..");
+            //var toEmail = new MailAddress(EmailID);
+            //var fromEmailPassword = "*******";
+            
+            //string subject = "";
+            //string body = "";
+            //if(EmailFor == "VerifyAccount")
+            //{
+
+            //subject = "your account is successfully created";
+            ////body = "<br/><br/><a href='"+link"'>"+link+"</a>";
+
+            //}
+            //else if(EmailFor == "ResetPassWord")
+            //{
+            // subject = "Reset PassWord";
+            // body = "hi,..We got request..below link to reset your password" + token;
+            //}
+            
+            //var smtp = new SmtpClient
+            //{
+
+            //    Host = "smtp.gmail.com",
+            //    Port = 587,
+            //    EnableSsl = true,
+            //    DeliveryMethod = SmtpDeliveryMethod.Network,
+            //    UseDefaultCredentials = false,
+            //    Credentials = new NetworkCredential(fromEmail.Address,fromEmailPassword)
+            //};
+
+
+        }
+        public ActionResult ForgotPassWord()
+        {
+            try
+            {
+                return View();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }           
+           
+        }
+        [HttpPost]
+
+        public ActionResult ForgotPassWord(string EmailID)
+        {
+            try
+            {
+                string message = "";
+                bool status = false;
+
+                using (StudentRegistrationEntities db = new StudentRegistrationEntities())                
+                {
+
+                    var account = db.tbl_Registration.Where(i => i.EmailID == EmailID).FirstOrDefault();
+
+                    if (account != null)
+                    {
+                        string resetcode = Guid.NewGuid().ToString();
+                        SendVerificationLinkEmail(account.EmailID,resetcode,"ResetPassWord");
+                        account.ResetPassWordLink = resetcode;
+
+                        db.Configuration.ValidateOnSaveEnabled = false;
+                        db.SaveChanges();
+                    }
+                    else
+                    {
+                        message = "Account not found";
+                    }
+                }
+                return View();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        //public ActionResult ResetPassword(string id)
+        //{
+        //    try
+        //    {
+        //        using (RegistrationEntities2 db = new RegistrationEntities2())
+        //        {
+        //            var account = db.tbl_Registration.Where(i => i.ResetPassWordLink == id).FirstOrDefault();
+
+        //            if (account == null)
+        //            {
+        //                EmployeeDetailsModel model = new EmployeeDetailsModel();
+        //                model.ResetLinkCode = id;
+        //                return View(model);
+                        
+        //            }
+        //            else
+        //            {
+        //                return HttpNotFound();
+        //            }
+
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+
+        //        throw ex;
+        //    }
+        //}
+        #endregion forgotpassword
+    }
+}
