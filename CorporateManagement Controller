@@ -1,0 +1,525 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Data;
+using System.Data.SqlClient;
+using System.ComponentModel.DataAnnotations;
+using Corporate_Management.Models;
+using Corporate_Management.DAL;
+using Corporate_Management.CorporateManagementDateObjects;
+using System.IO;
+
+namespace Corporate_Management.Controllers
+{
+    public class CorporateManagementController : Controller
+    {
+        //
+        // GET: /CorporateManagement/
+        public ActionResult Index()
+        {
+            return View();
+        }
+        #region employee
+        public ActionResult Employee()
+        {
+            try
+            {
+                
+                List<EmployeeModel> employee = new List<EmployeeModel>();                
+                employee = CorporateManagementData.GetEmployees();
+                ModelState.Clear();                
+                return View(employee);
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult Employee(EmployeeModel employee)
+        {
+            try
+            {
+                using (CorporateManagementEntities db = new CorporateManagementEntities())
+                {
+                    var empname = db.EmployeeMasters.Where(i => i.EmployeeName == employee.EmployeeName && i.IsDelete == false).FirstOrDefault();
+                    if (empname == null)
+                    {
+                        CorporateManagementData.AddEmployee(employee);
+                        return RedirectToAction("Employee");
+                    }
+                    else
+                    {                        
+                        return RedirectToAction("Employee", new EmployeeModel { LinkErrormsg = "user name is exists"});
+                    }
+                
+                }
+                
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateEmployee(long id)
+        {
+            try
+            {
+                List<EmployeeModel> employee = new List<EmployeeModel>();
+                employee = CorporateManagementData.GetEmployee(id);
+                ModelState.Clear();
+                return View(employee);
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateEmployee(EmployeeModel employee)
+        {
+            try
+            {
+                CorporateManagementData.UpadateEmployee(employee);                
+                return RedirectToAction("Employee");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult DeleteEmployee(long id)
+        {
+            try
+            {
+                CorporateManagementData.DeleteEmployee(id);
+                ModelState.Clear();
+                return RedirectToAction("Employee");
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        #endregion employee
+        #region department
+        public ActionResult Department()
+        {
+            try
+            {
+                List<DepartmentModel> department = new List<DepartmentModel>();
+                department = CorporateManagementData.GetDepartments();
+                ModelState.Clear();
+                return View(department);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult Department(DepartmentModel department)
+        {
+            try
+            {
+                CorporateManagementData.AddDepartment(department);
+                return RedirectToAction("Department");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateDepartment(long id)
+        {
+            try
+            {
+                List<DepartmentModel> department = new List<DepartmentModel>();
+                department = CorporateManagementData.GetDepartment(id);
+                ModelState.Clear();
+                return View(department);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateDepartment(DepartmentModel department)
+        {
+            try
+            {
+                CorporateManagementData.UpdateDepartment(department);                
+                return RedirectToAction("Department");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult DeleteDepartment(long id)
+        {
+            try
+            {
+                CorporateManagementData.DeleteDepartment(id);
+                ModelState.Clear();
+                return RedirectToAction("Department");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion department
+        #region qualification
+        public ActionResult Qualification()
+        {
+            try
+            {
+                List<QualificationModel> qualification = new List<QualificationModel>();
+                qualification = CorporateManagementData.GetQualifications();
+                return View(qualification);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult Qualification(QualificationModel qualification)
+        {
+            try
+            {
+                CorporateManagementData.AddQualification(qualification);
+                ModelState.Clear();
+                return RedirectToAction("Qualification");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateQualification(long id)
+        {
+            try
+            {
+                List<QualificationModel> qualification = new List<QualificationModel>();
+                qualification = CorporateManagementData.GetQualification(id);
+                return View(qualification);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateQualification(QualificationModel qualification)
+        {
+            try
+            {
+                CorporateManagementData.UpdateQualification(qualification);
+                ModelState.Clear();
+                return RedirectToAction("Qualification");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult DeleteQualification(long id)
+        {
+            try
+            {
+                CorporateManagementData.DeleteQualification(id);
+                ModelState.Clear();
+                return RedirectToAction("Qualification");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion qualification
+        #region skillset
+        public ActionResult SkillSet()
+        {
+            try
+            {
+                List<SkillSetModel> skillset = new List<SkillSetModel>();
+                skillset = CorporateManagementData.GetSkillSets();
+                ModelState.Clear();
+                return View(skillset);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult SkillSet(SkillSetModel skillset)
+        {
+            try
+            {
+                CorporateManagementData.AddSkillSet(skillset);
+                ModelState.Clear();
+                return RedirectToAction("SkillSet");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateSkillSet(long id)
+        {
+            try
+            {
+                List<SkillSetModel> skillset = new List<SkillSetModel>();
+                skillset = CorporateManagementData.GetSkillSet(id);
+                ModelState.Clear();
+                return View(skillset);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateSkillSet(SkillSetModel skillset)
+        {
+            try
+            {
+                CorporateManagementData.UpdateSkillSet(skillset);
+                ModelState.Clear();
+                return RedirectToAction("SkillSet");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult DeleteSkillSet(long id)
+        {
+            try
+            {
+                CorporateManagementData.DeleteSkillSet(id);
+                ModelState.Clear();
+                return RedirectToAction("SkillSet");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion skillset
+        #region EmployeeDetails
+        public ActionResult EmployeeDetail()
+        {
+            try
+            {
+                ViewBag.Employee = CorporateManagementData.GetDrpFroEmployee();
+                ViewBag.Department = CorporateManagementData.GetDrpForDepartment();
+                ViewBag.Qualification = CorporateManagementData.GetDrpForQualification();
+                ViewBag.SkillSetName = CorporateManagementData.GetChkForSkillSetName();
+
+                List<EmployeeDetailsModel> employeedetail = new List<EmployeeDetailsModel>();
+                employeedetail = CorporateManagementData.GetEmployeeDetails();
+                ModelState.Clear();
+
+                if (employeedetail.Count > 0)
+                {
+                    foreach (var name in employeedetail)
+                    {
+                        name.EmployeeName = CorporateManagementData.GetEmployeeNameFromID(name.EmployeeID);
+                        name.DepartmentName = CorporateManagementData.GetDepartmentNameFromID(name.DepartmentID);
+                        name.QualificationName = CorporateManagementData.GetQualificationNameFromID(name.QualificationID);                    
+                    
+                    }
+                }
+                
+                return View(employeedetail);
+            }
+            catch (Exception ex)
+            {                
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult EmployeeDetail(EmployeeDetailsModel employee, string[] SkillSetName, HttpPostedFileBase ImagePath)
+        {
+            try
+            {
+                string Skill = string.Join(",", SkillSetName);
+                employee.SkillSetName = Skill;
+
+                string filename = Path.GetFileName(ImagePath.FileName);
+                string paths = Server.MapPath("~/Uploads/");
+
+                if (!Directory.Exists(paths))
+                {
+                    Directory.CreateDirectory(paths);
+                }
+                paths = "~/Uploads/" + filename;
+
+                ImagePath.SaveAs(Server.MapPath(paths));
+
+                employee.ImageName = filename;
+                employee.Attachment = paths;
+
+                Session["ImageName"] = filename;
+
+                ViewBag.Employee = CorporateManagementData.GetDrpFroEmployee();
+                ViewBag.Department = CorporateManagementData.GetDrpForDepartment();
+                ViewBag.Qualification = CorporateManagementData.GetDrpForQualification();
+                ViewBag.SkillSetName = CorporateManagementData.GetChkForSkillSetName();
+
+                long EmployeeID = CorporateManagementData.GetEmployeeIDFromName(employee.EmployeeName);
+                employee.EmployeeID = EmployeeID;
+
+                long DepartmentID = CorporateManagementData.GetDepartmentIDFromName(employee.DepartmentName);
+                employee.DepartmentID = DepartmentID;
+
+                long QualificationID = CorporateManagementData.GetQualificationIDFromName(employee.QualificationName);
+                employee.QualificationID = QualificationID;
+
+                CorporateManagementData.AddEmployeeDetails(employee);
+                ModelState.Clear();
+                return RedirectToAction("EmployeeDetail");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateEmployeeDetail(long id)
+        {
+            try
+            {
+                ViewBag.Employee = CorporateManagementData.GetDrpFroEmployee();
+                ViewBag.Department = CorporateManagementData.GetDrpForDepartment();
+                ViewBag.Qualification = CorporateManagementData.GetDrpForQualification();
+                ViewBag.SkillSetName = CorporateManagementData.GetChkForSkillSetName();
+                
+
+                List<EmployeeDetailsModel> employeedetail = new List<EmployeeDetailsModel>();
+                
+                employeedetail = CorporateManagementData.GetEmployeeDetail(id);
+                ModelState.Clear();
+
+                if (employeedetail.Count > 0)
+                {
+                    foreach (var name in employeedetail)
+                    {
+                        name.EmployeeName = CorporateManagementData.GetEmployeeNameFromID(name.EmployeeID);
+                        name.DepartmentName = CorporateManagementData.GetDepartmentNameFromID(name.DepartmentID);
+                        name.QualificationName = CorporateManagementData.GetQualificationNameFromID(name.QualificationID);                        
+
+                    }
+                }
+
+                return View(employeedetail);
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        [HttpPost]
+
+        public ActionResult UpdateEmployeeDetail(EmployeeDetailsModel employee,string[] SkillSetName,HttpPostedFileBase ImagePath)
+        {
+            try
+            {
+                string Skill = string.Join(",", SkillSetName);
+                employee.SkillSetName = Skill;
+
+                string filename = Path.GetFileName(ImagePath.FileName);
+                string paths = Server.MapPath("~/Uploads/");
+
+                if (!Directory.Exists(paths))
+                {
+                    Directory.CreateDirectory(paths);
+                }
+                paths = "~/Uploads/" + filename;
+
+                ImagePath.SaveAs(Server.MapPath(paths));
+
+                employee.ImageName = filename;
+                employee.Attachment = paths;
+
+                ViewBag.Employee = CorporateManagementData.GetDrpFroEmployee();
+                ViewBag.Department = CorporateManagementData.GetDrpForDepartment();
+                ViewBag.Qualification = CorporateManagementData.GetDrpForQualification();
+                ViewBag.SkillSetName = CorporateManagementData.GetChkForSkillSetName();
+
+                long EmployeeID = CorporateManagementData.GetEmployeeIDFromName(employee.EmployeeName);
+                employee.EmployeeID = EmployeeID;
+
+                long DepartmentID = CorporateManagementData.GetDepartmentIDFromName(employee.DepartmentName);
+                employee.DepartmentID = DepartmentID;
+
+                long QualificationID = CorporateManagementData.GetQualificationIDFromName(employee.QualificationName);
+                employee.QualificationID = QualificationID;
+
+
+                CorporateManagementData.UpadteEmployeeDetails(employee);
+                ModelState.Clear();
+                return RedirectToAction("EmployeeDetail");
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        public ActionResult DeleteEmployeeDetail(long id)       
+        {
+
+            try
+            {
+                CorporateManagementData.DeleteEmployeeDetails(id);
+                ModelState.Clear();
+                return RedirectToAction("EmployeeDetail");
+
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        #endregion EmployeeDetails
+    }
+}
