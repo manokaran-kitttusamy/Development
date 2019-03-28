@@ -1,0 +1,237 @@
+@model IEnumerable<MachineTest.Models.ProjectDetailModel>
+
+@{
+    ViewBag.Title = "ProjectDetail";
+}
+
+@* for radio button plugins *@
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<link href="~/Content/bootstrap.css" rel="stylesheet" />
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+<link href="~/Content/CSS.css" rel="stylesheet" />
+
+
+@* for calender plugins *@
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js" type="text/javascript"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js" type="text/javascript"></script>
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="Stylesheet" type="text/css" />
+
+
+
+<div class="row" style="width:auto;height:auto;">
+    <div class="col-sm-3" style="background-color:lavender;width:auto;height:655px">
+        <h1></h1>
+        <h2></h2>
+        @Html.ActionLink("AddProject", "Project", new { @id = "projectlink" })<br />
+        @Html.ActionLink("AddModule", "Module", new { @id = "modulelink" })<br />
+        @Html.ActionLink("AddProjectStatus", "ProjectStatus", new { @id = "projectstslink" })<br />
+        @Html.ActionLink("AddTechnology", "Technology", new { @id = "techlink" })<br />        
+    </div>
+    <div class="col-sm-6" style="background-color: lavender; width: auto; height: 655px">
+        <h1></h1>
+        <h2></h2>
+        @using (Html.BeginForm("ProjectDetail", "MachineTest", FormMethod.Post, new { @id = "projectdetailform" }))
+        {
+            @Html.AntiForgeryToken()
+            <form style="width:auto;margin:auto" class="form-control">
+                <table>
+                    <tr>
+                        <td>@Html.Label("ProjectName", new { @id = "lblprojname" })</td>
+                        <td>@Html.DropDownList("ProjectName", ViewBag.Project as IEnumerable<SelectListItem>, new { @id = "drpProjname",@class="form-control",@style="height:35px;",@required = "required", @title = "Project name Is Required" })</td>
+                        <td>@Html.ValidationMessage("ProjectName", "", new { @class = "text-danger", @style = "color:red;width:110px;height:150px;" })</td>
+
+                    </tr>
+                    <tr>
+                        <td>@Html.Label("ModuleName", new { @id = "lblModname" })</td>  
+                        <td>@Html.DropDownList("ModuleName", ViewBag.Module as IEnumerable<SelectListItem>, new { @id = "drpModname",@class="form-control",@style="height:35px", @required = "required", @title = "Module Name Is Required" })</td>
+                        <td>@Html.ValidationMessage("ModuleName", "", new { @class = "text-danger", @style = "color:red;width:110px;height:150px;" })</td>
+                    </tr>
+                    <tr>
+                        <td>@Html.Label("ProjectStatusName", new { @id = "lblprojsts" })</td>
+                        <td>@Html.DropDownList("ProjectStatusName", ViewBag.ProjectStatus as IEnumerable<SelectListItem>, new { @id = "drpProjsts",@class="form-control",@style="height:35px", @required = "required", @title = "ProjectStatus Name Is Required" })</td>
+                        <td>@Html.ValidationMessage("ProjectStatusName", "", new { @class = "text-danger", @style = "color:red;width:110px;height:150px;" })</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("TechnologyName", new { @id = "lbltechname", @required = "required" })
+                        </td>
+                        <td>
+                            @foreach (var items in ViewBag.TechnologyName)
+                            {
+                                <input type="checkbox" id=@items.Text name="TechnologyName" title="Technology Name Is Required" value="@items.Text" />@items.Text
+                            }
+                        </td>
+                        <td>@Html.ValidationMessage("TechnologyName", "", new { @class = "text-danger", @style = "color:red;width:110px;height:150px;" })</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("ProjectStartDate", new { @id = "lblprojstart" })
+                        </td>
+                        <td>
+                            @Html.TextBox("ProjectStartDate", "", new { @id = "txtprojstart", @class = "form-control", @required = "required", @readonly = "readonly", @title = "ProjectStartDate Is Required" })
+                        </td>
+                        <td>@Html.ValidationMessage("ProjectStartDate", "", new { @class = "text-danger", @style = "color:red;width:110px;height:150px;" })</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("ProjectEndDate", new { @id = "lblprojend" })
+                        </td>
+                        <td>
+                            @Html.TextBox("ProjectEndDate", "", new { @id = "txtprojend", @class = "form-control", @required = "required", @readonly = "readonly", @title = "ProjectEndDate Is Required" })
+                        </td>
+                        <td>@Html.ValidationMessage("ProjectEndDate", "", new { @class = "text-danger", @style = "color:red;width:110px;height:150px;" })</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("TotalDays", new { @id = "lbltotday" })
+                        </td>
+                        <td>
+                            @Html.TextBox("TotalDays", "", new { @id = "txttotday", @class = "form-control", @readonly = "readonly" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.Label("Description", new { @id = "lbldes" })
+                        </td>
+                        <td>
+                            @Html.TextArea("Description", "", new { @id = "txtdes", @class = "form-control", @maxlength = "150" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                    <tr>  
+                        <td>
+                            @Html.Label("TaskStatus", new { @id = "lbltaskstatus" })
+                        </td>
+                        @*<td>
+                            ---radio button----
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" id="defaultGroupExample1" name="groupOfDefaultRadios" value="" checked="checked">
+                                <label class="custom-control-label" for="defaultGroupExample1" style="color:grey;">Active</label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" id="defaultGroupExample2" name="groupOfDefaultRadios" value="0">
+                                <label class="custom-control-label" for="defaultGroupExample2" style="color:grey;">InActive</label>
+                            </div>
+                        </td>
+                        <td style="width:25px;">
+                            @Html.RadioButton("TaskStatus", "Active", true, new { @id = "rbtskstsa", @class = "form-control", @style = "width:60px;height:25px", @required = "required", @title = "TaskStatus is Required" })                        
+                            @Html.Label("Active", new { @class = "form-control", @style = "width:70px;height:28px;color:grey;" })
+                        </td>
+                        <td>
+                            @Html.RadioButton("TaskStatus", "InActive", false, new { @id = "rbtskstsia", @class = "form-control", @style = "width:60px;height:25px", @required = "required" })                        
+                            @Html.Label("InActive", new { @class = "form-control", @style = "width:70px;height:28px;color:grey;" })
+                        </td>
+                        <td>
+                            @Html.ValidationMessage("TaskStatus", "", new { @class = "text-danger", @style = "color:red;width:110px;height:150px;" })
+                        </td>*@
+                        <td>                        
+                            <div class="wrapper">
+                                <div class="toggle_radio">
+                                    <input type="radio" class="form-control" id="first_toggle" name="TaskStatus" value="Active" checked>
+                                    <label for="first_toggle"><p><b>Active</b></p></label>
+                                    <input type="radio" class="form-control" id="second_toggle" name="TaskStatus" value="InActive">
+                                    <label for="second_toggle"><p><b>InActive</b></p></label>
+                                    <div class="toggle_option_slider">
+                                    </div>
+                                </div>
+                            </div>
+                        </td>         
+                    </tr>
+                </table>              
+                <br />
+                <br />
+                <div>
+                    <input type="submit" name="save" id="save" value="Save" class="btn btn-outline-success" />
+                    <input type="reset" name="clear" id="clear" value="Clear" class="btn btn-outline-danger" />
+                </div>
+            </form>
+            <br />
+
+        }
+        <br />
+    </div>    
+    <div class="col-sm-3" style="background-color: lavender; width: auto; height: 655px">
+        <h1></h1>
+        <h2></h2>       
+        @Html.ActionLink("Select", "GridView", new { @id = "gridlink" })<br />
+    </div>
+</div>
+
+<br />
+<br />
+
+<table class="table" style="background-color:lavender;">
+    <thead class="black white-text" style="color:red;font-size:large">
+        <tr>
+            <th>Project<br />Name</th>
+            <th>Module<br />Name</th>
+            <th>Project<br />Status</th>
+            <th>Technology<br />Name</th>
+            <th>ProjectStart<br />Date</th>
+            <th>ProjectEnd<br />Date</th>
+            <th>Total<br />Days</th>
+            <th>Description</th>
+            <th>Task<br />Status</th>
+            <th colspan="3">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var items in Model)
+        {
+            <tr style="font-size:medium;">
+                <td>@items.ProjectName</td>
+                <td>@items.ModuleName</td>
+                <td>@items.ProjectStatusName</td>
+                <td>@items.TechnologyName</td>
+                <td>@items.ProjectStartDate</td>
+                <td>@items.ProjectEndDate</td>
+                <td>@items.TotalDays</td>
+                <td>@items.Description</td>
+                <td>@items.TaskStatus</td>
+                @*<td>@Html.ActionLink("Edit", "UpdateProjectDetail", new { @id = @items.ProjectDetailID })</td>
+                <td>@Html.ActionLink("Delete", "DeleteProjectDetail", new { @id = @items.ProjectDetailID })</td>*@
+                <td>
+                    <a href="@Url.Action("UpdateProjectDetail", "MachineTest", new { id = items.ProjectDetailID })">
+                        <img src="@Url.Content("~/Content/Images/editbutton-android_v1.png")" style="width:38px;height:38px;" />
+                    </a>
+                </td>
+                <td>
+                    <a href="@Url.Action("DeleteProjectDetail", "MachineTest", new { id = items.ProjectDetailID })">
+                        <img src="@Url.Content("~/Content/Images/red-delete-button-png-1.png ")" style="width:38px;height:38px;" />
+                    </a>
+                </td>        
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function () {
+        debugger;
+        $("#txtprojstart").datepicker();
+        $("#txtprojend").datepicker();
+
+        $("#txtprojend").change(function () {
+            debugger;
+            var date1 = new Date($("#txtprojstart").val());
+            var date2 = new Date($("#txtprojend").val());
+
+            var dateDiff = new Date(date2 - date1);
+            var diff = dateDiff / 1000 / 60 / 60 / 24;
+
+            $("#txttotday").val(diff);
+            function validateForm() {
+                var x = document.forms["projdet"]["ProjectName"].value;
+                if (x == "") {
+                    alert("Project Name Is Required");
+                    return false;
+                }
+            }
+        });
+    });
+</script>
+
