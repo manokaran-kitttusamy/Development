@@ -1,3 +1,15 @@
+Controller:
+
+public ActionResult GridView()
+        {
+            MachineTestEntities db = new MachineTestEntities();
+            var grid = db.ProjectDetails.ToList();
+            return View(grid);
+        }        
+        
+        
+View:
+
 @model IEnumerable<MachineTest.DAL.ProjectDetail>
 
 @{
