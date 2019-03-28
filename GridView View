@@ -1,0 +1,33 @@
+@model IEnumerable<MachineTest.DAL.ProjectDetail>
+
+@{
+    ViewBag.Title = "GridView";
+    WebGrid grid = new WebGrid(Model);
+}
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+
+<div style="font-size:large">
+    @Html.ActionLink("Back", "ProjectDetail")
+</div>
+<br />
+<br />
+
+<h2>GridView</h2>
+
+<table class="table" style="background-color:lavender;">
+    <thead class="black white-text" style="color:red;font-size:medium">
+        <tr>
+
+        </tr>
+    </thead>
+    <tbody>
+        @grid.GetHtml()
+    </tbody>
+</table>
+
+    @*<form>
+        <div class="form-group" style="font-size:large;">
+            @grid.GetHtml()
+        </div>
+    </form>*@
