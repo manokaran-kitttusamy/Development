@@ -1,0 +1,510 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Data;
+using System.Data.SqlClient;
+using System.ComponentModel.DataAnnotations;
+using MachineTest.DAL;
+using MachineTest.MachineTestDataObjects;
+using MachineTest.Models;
+using System.Text;
+using System.IO;
+
+namespace MachineTest.Controllers
+{
+    public class MachineTestController : Controller
+    {
+        //
+        // GET: /MachineTest/
+        public ActionResult Index()
+        {
+            return View();
+        }
+        #region project
+        public ActionResult Project()
+        {
+            try
+            {
+                List<ProjectModel> project = new List<ProjectModel>();
+                project = MachineTestData.GetProjects();
+                ModelState.Clear();
+                return View(project);
+
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult Project(ProjectModel project)
+        {
+            try
+            {
+                MachineTestData.AddProject(project);                
+                return RedirectToAction("Project");
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateProject(long ID)
+        {
+            try
+            {
+                List<ProjectModel> project = new List<ProjectModel>();
+                project = MachineTestData.GetProject(ID);
+                return View(project);
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateProject(ProjectModel project)
+        {
+            try
+            {
+                MachineTestData.UpdateProject(project);
+                ModelState.Clear();
+                return RedirectToAction("Project");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult DeleteProject(long ID)
+        {
+            try
+            {                 
+                MachineTestData.DeleteProject(ID);
+                ModelState.Clear();
+                return RedirectToAction("Project");
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        #endregion project
+        #region Module
+        public ActionResult Module()
+        {
+            try
+            {
+                ViewBag.Project = MachineTestData.GetProjectForDropDown();
+                List<ModuleModel> module = new List<ModuleModel>();
+                module = MachineTestData.GetModules();
+                if (module.Count > 0)
+                {
+                    foreach (var name in module)
+                    {
+
+                        name.ProjectName = MachineTestData.GetProjectNameFromID(name.ProjectID);
+                    }
+                }
+                ModelState.Clear();
+                return View(module);
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult Module(ModuleModel module)
+        {
+            try
+            {
+                long ProjectID = MachineTestData.GetIDFromProjectName(module.ProjectName);
+                module.ProjectID = ProjectID;
+
+                ViewBag.Project = MachineTestData.GetProjectForDropDown();
+                MachineTestData.AddModule(module);
+                return RedirectToAction("Module");
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateModule(long ID)
+        {
+            try
+            {
+                ViewBag.Project = MachineTestData.GetProjectForDropDown();
+                List<ModuleModel> module = new List<ModuleModel>();
+                module = MachineTestData.GetModule(ID);
+                return View(module);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateModule(ModuleModel module)
+        {
+            try
+            {
+                long ProjectID = MachineTestData.GetIDFromProjectName(module.ProjectName);
+                module.ProjectID = ProjectID;
+
+                ViewBag.Project = MachineTestData.GetProjectForDropDown();
+                MachineTestData.UpdateModule(module);
+                ModelState.Clear();
+                return RedirectToAction("Module");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult DeleteModule(long ID)
+        {
+            try
+            {
+                MachineTestData.DeleteModule(ID);
+                ModelState.Clear();
+                return RedirectToAction("Module");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion Module
+        #region ProjectStatus
+        public ActionResult ProjectStatus()
+        {
+            try
+            {
+                List<ProjectStatusModel> projectstatus = new List<ProjectStatusModel>();
+                projectstatus = MachineTestData.GetProjectStatuss();
+                ModelState.Clear();
+                return View(projectstatus);
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult ProjectStatus(ProjectStatusModel projectstatus)
+        {
+            try
+            {
+                MachineTestData.AddProjectStatus(projectstatus);
+                return RedirectToAction("ProjectStatus");
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateProjectStatus(long ID)
+        {
+            try
+            {
+                List<ProjectStatusModel> projectstatus = new List<ProjectStatusModel>();
+                projectstatus = MachineTestData.GetProjectStatus(ID);
+                return View(projectstatus);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateProjectStatus(ProjectStatusModel projectstatus)
+        {
+            try
+            {
+                MachineTestData.UpdateProjectStatus(projectstatus);
+                ModelState.Clear();
+                return RedirectToAction("ProjectStatus");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult DeleteProjectStatus(long ID)
+        {
+            try
+            {
+                MachineTestData.DeleteProjectStatus(ID);
+                ModelState.Clear();
+                return RedirectToAction("ProjectStatus");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion ProjectStatus
+        #region Technology
+        public ActionResult Technology()
+        {
+            try
+            {
+                List<TechnologyModel> technology = new List<TechnologyModel>();
+                technology = MachineTestData.GetTechnologys();
+                ModelState.Clear();
+                return View(technology);
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult Technology(TechnologyModel technology)
+        {
+            try
+            {
+                MachineTestData.AddTechnology(technology);
+                return RedirectToAction("Technology");
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateTechnology(long ID)
+        {
+            try
+            {
+                List<TechnologyModel> technology = new List<TechnologyModel>();
+                technology = MachineTestData.GetTechnology(ID);
+                return View(technology);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateTechnology(TechnologyModel technology)
+        {
+            try
+            {
+                MachineTestData.UpdateTechnology(technology);
+                ModelState.Clear();
+                return RedirectToAction("Technology");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult DeleteTechnology(long ID)
+        {
+            try
+            {
+                MachineTestData.DeleteTechnology(ID);
+                ModelState.Clear();
+                return RedirectToAction("Technology");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion Technology
+        #region ProjectDetail
+        public ActionResult ProjectDetail()
+        {
+            try
+            {
+
+                ViewBag.Project = MachineTestData.GetProjectForDropDown();
+                ViewBag.Module = MachineTestData.GetModuleForDropdown();
+                ViewBag.ProjectStatus = MachineTestData.GetProjectStatusForDropdown();
+                ViewBag.TechnologyName = MachineTestData.GetTechnologyForDropdown();
+
+                List<ProjectDetailModel> ProjectDetail = new List<ProjectDetailModel>();
+                ProjectDetail = MachineTestData.GetProjectDetails();
+                if (ProjectDetail.Count > 0)
+                {
+                    foreach (var name in ProjectDetail)
+                    {
+
+                        name.ProjectName = MachineTestData.GetProjectNameFromID(name.ProjectID);
+                        name.ModuleName = MachineTestData.GetmoduleNamefromID(name.ModuleID);
+                        name.ProjectStatusName = MachineTestData.GetprojectstatusNamefromID(name.ProjectStatusID);
+                    }
+                }
+                ModelState.Clear();
+                return View(ProjectDetail);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]        
+        public ActionResult ProjectDetail(ProjectDetailModel ProjectDetail, string[] TechnologyName)
+        {
+            try
+            {
+
+                string techs = string.Join(",", TechnologyName);
+
+                ProjectDetail.TechnologyName = techs;
+
+                long ProjectID = MachineTestData.GetIDFromProjectName(ProjectDetail.ProjectName);
+                ProjectDetail.ProjectID = ProjectID;
+
+                long ModuleID = MachineTestData.GetIDFromModuleName(ProjectDetail.ModuleName);
+                ProjectDetail.ModuleID = ModuleID;
+
+                long ProjectStatusID = MachineTestData.GetIDFromProjectStatusName(ProjectDetail.ProjectStatusName);
+                ProjectDetail.ProjectStatusID = ProjectStatusID;
+
+
+                ViewBag.Project = MachineTestData.GetProjectForDropDown();
+                ViewBag.Module = MachineTestData.GetModuleForDropdown();
+                ViewBag.ProjectStatus = MachineTestData.GetProjectStatusForDropdown();
+                ViewBag.TechnologyName = MachineTestData.GetTechnologyForDropdown();
+
+                MachineTestData.AddProjectDetail(ProjectDetail);
+                ModelState.Clear();
+                return RedirectToAction("ProjectDetail");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateProjectDetail(long Id)
+        {
+            try
+            {
+
+                ViewBag.Project = MachineTestData.GetProjectForDropDown();
+                ViewBag.Module = MachineTestData.GetModuleForDropdown();
+                ViewBag.ProjectStatus = MachineTestData.GetProjectStatusForDropdown();
+                ViewBag.TechnologyName = MachineTestData.GetTechnologyForDropdown();
+
+                List<ProjectDetailModel> ProjectDetail = new List<ProjectDetailModel>();
+                ProjectDetail = MachineTestData.GetProjectDetail(Id);
+                if (ProjectDetail.Count > 0)
+                {
+
+                    foreach (var mod in ProjectDetail)
+                    {
+                        mod.ProjectName = MachineTestData.GetProjectNameFromID(mod.ProjectID);
+                        mod.ModuleName = MachineTestData.GetmoduleNamefromID(mod.ModuleID);
+                        mod.ProjectStatusName = MachineTestData.GetprojectstatusNamefromID(mod.ProjectStatusID);
+                    }
+                }
+                return View(ProjectDetail);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+
+        public ActionResult UpdateProjectDetail(ProjectDetailModel ProjectDetail, string[] TechnologyName)
+        {
+            try
+            {
+
+                string techs = string.Join(",", TechnologyName);
+
+                ProjectDetail.TechnologyName = techs;
+
+                long ProjectID = MachineTestData.GetIDFromProjectName(ProjectDetail.ProjectName);
+                ProjectDetail.ProjectID = ProjectID;
+
+                long ModuleID = MachineTestData.GetIDFromModuleName(ProjectDetail.ModuleName);
+                ProjectDetail.ModuleID = ModuleID;
+
+                long ProjectStatusID = MachineTestData.GetIDFromProjectStatusName(ProjectDetail.ProjectStatusName);
+                ProjectDetail.ProjectStatusID = ProjectStatusID;
+
+                MachineTestData.EditProjectDetail(ProjectDetail);
+                ModelState.Clear();
+                return RedirectToAction("ProjectDetail");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult DeleteProjectDetail(long Id)
+        {
+            try
+            {
+                MachineTestData.DeleteProjectDetail(Id);
+                ModelState.Clear();
+                return RedirectToAction("ProjectDetail");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+
+        public ActionResult GridView()
+        {
+            MachineTestEntities db = new MachineTestEntities();
+            var grid = db.ProjectDetails.ToList();
+            return View(grid);
+        }        
+        #endregion ProjectDetail
+    }
+}
+
+ 
