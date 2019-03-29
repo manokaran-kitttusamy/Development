@@ -1,5 +1,9 @@
 Global.aspx:
 
+using System.Data;
+using System.Data.SqlClient;
+using WebMatrix.WebData;
+
   WebSecurity.InitializeDatabaseConnection("MachineTestEntities", "ProjectDetail", "ProjectDetailID", "UserName", autoCreateTables: true);   
   
   (main web.config file)membership and reole manager files:
