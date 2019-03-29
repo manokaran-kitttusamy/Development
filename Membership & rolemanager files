@@ -1,3 +1,7 @@
+Global.aspx:
+
+  WebSecurity.InitializeDatabaseConnection("MachineTestEntities", "ProjectDetail", "ProjectDetailID", "UserName", autoCreateTables: true);   
+  
   (main web.config file)membership and reole manager files:
   
   
