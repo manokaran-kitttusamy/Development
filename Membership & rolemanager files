@@ -1,0 +1,19 @@
+  (main web.config file)membership and reole manager files:
+  
+  
+  <membership defaultProvider="SimpleMembershipProvider">
+      <providers>
+        <add name="SimpleMembershipProvider" type="WebMatrix.WebData.SimpleMembershipProvider, WebMatrix.WebData" />
+      </providers>
+    </membership>
+    <roleManager enabled="true" defaultProvider="SimpleRoleProvider">
+      <providers>
+        <add name="SimpleRoleProvider" type="WebMatrix.WebData.SimpleRoleProvider, WebMatrix.WebData" />
+      </providers>
+    </roleManager>
+    
+    
+    (sub web.config file):
+    
+    <add namespace="System.Web.Helpers" />
+    <add namespace="System.Web.WebPages" />
