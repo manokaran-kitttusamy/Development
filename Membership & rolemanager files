@@ -9,6 +9,11 @@ using WebMatrix.WebData;
   (main web.config file)membership and reole manager files:
   
   
+  
+  <authentication mode="Forms">
+      <forms loginUrl="~/ForgetPassWord/ForgotPassWord"></forms>
+    </authentication>
+    
   <membership defaultProvider="SimpleMembershipProvider">
       <providers>
         <add name="SimpleMembershipProvider" type="WebMatrix.WebData.SimpleMembershipProvider, WebMatrix.WebData" />
