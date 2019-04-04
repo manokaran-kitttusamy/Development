@@ -28,25 +28,24 @@ namespace Registration.Controllers
         }
 
 
-        #region State loading based on Country
+       #region State loading based on Country
         public JsonResult LoadStateBasedonCountry(string Id)
         {
-            long contryId = Convert.ToInt64(Id);
+            long CountryID = CountryStateCityData.GetCountryIDFromName(Id);
             List<StateModel> state = new List<StateModel>();
-            state = RegistrationData.GetStateByCountryId(contryId);
+            state = CountryStateCityData.GetStateByCountryId(CountryID);
             return Json(state, JsonRequestBehavior.AllowGet);
         }
         #endregion
 
-        #region City loading based on State
-        public JsonResult LoadCityBasedonState(string Id)
+         #region getcity
+        public JsonResult GetCity(long Id)
         {
-            long cityId = Convert.ToInt64(Id);
             List<CityModel> city = new List<CityModel>();
-            city = RegistrationData.GetCityByStateId(cityId);
+            city = CountryStateCityData.GetCityByStateId(Id);
             return Json(city, JsonRequestBehavior.AllowGet);
         }
-        #endregion
+        #endregion getcity
 
         #region Country
         public ActionResult Country()
