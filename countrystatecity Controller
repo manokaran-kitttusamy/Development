@@ -1,0 +1,570 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Data;
+using System.Data.SqlClient;
+using System.ComponentModel.DataAnnotations;
+using CountryStateCity.Models;
+using CountryStateCity.DAL;
+using CountryStateCity.CountryStateCityDataObjects;
+using System.IO;
+using System.Text;
+
+
+namespace CountryStateCity.Controllers
+{
+    public class CountryStatecityController : Controller
+    {
+        //
+        // GET: /CountryStatecity/
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        #region State loading based on Country
+        public JsonResult LoadStateBasedonCountry(string countryName)
+        {
+            long ctryId = CountryStateCityData.GetCountryIDFromName(countryName);
+            List<StateModel> state = new List<StateModel>();
+            state = CountryStateCityData.GetStateByCountryId(ctryId);
+            return Json(state, JsonRequestBehavior.AllowGet);
+        }
+        #endregion
+
+        //#region City loading based on State
+        //public JsonResult LoadCityBasedonState(string Id)
+        //{
+        //    long cityId = Convert.ToInt64(Id);
+        //    List<CityModel> city = new List<CityModel>();
+        //    city = CountryStateCityData.GetCityByStateId(cityId);
+        //    return Json(city, JsonRequestBehavior.AllowGet);
+        //}
+        //#endregion
+        #region getcity
+        public JsonResult GetCity(string Id)
+        {
+
+            long GetCityID = CountryStateCityData.GetCityIDByStateName(Id);
+
+
+            List<CityModel> city = new List<CityModel>();
+            city = CountryStateCityData.GetCityByStateId(GetCityID);
+            return Json(city, JsonRequestBehavior.AllowGet);
+        }
+        #endregion getcity
+
+        #region Country
+        public ActionResult Country()
+        {
+            try
+            {
+                List<CountryModel> country = new List<CountryModel>();
+                country = CountryStateCityData.GetAllCountry();
+                return View(country);
+                
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult Country(CountryModel country)
+        {
+            try
+            {       
+
+                CountryStateCityData.AddCountry(country);
+                return RedirectToAction("Country");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateCountry(long id)
+        {
+            try
+            {
+                List<CountryModel> count = new List<CountryModel>();
+                count = CountryStateCityData.GetCountry(id);
+                return View(count);
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateCountry(CountryModel country)
+        {
+            try
+            {
+                CountryStateCityData.UpdateCountry(country);
+                return RedirectToAction("Country");
+
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+
+        }
+
+        public ActionResult DeleteCountry(long id)
+        {
+            try
+            {
+                CountryStateCityData.DeleteCountry(id);
+                return RedirectToAction("Country");
+
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        #endregion country
+        #region state
+        public ActionResult State()
+        {
+            try
+            {
+                ViewBag.Country = CountryStateCityData.DrpForCountry();
+                List<StateModel> state = new List<StateModel>();
+                state = CountryStateCityData.GetAllState();
+                if (state.Count > 0)
+                {
+                    foreach (var stat in state)
+                    {
+                        stat.CountryName = CountryStateCityData.GetCountryNameFromID(stat.CountryID);
+                    }
+                }
+                return View(state);
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult State(StateModel state)
+        {
+            try
+            {
+                ViewBag.Country = CountryStateCityData.DrpForCountry();
+
+                long CountryID = CountryStateCityData.GetCountryIDFromName(state.CountryName);
+                state.CountryID = CountryID;
+
+                CountryStateCityData.AddState(state);
+                return RedirectToAction("State");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateState(long id)
+        {
+            try
+            {
+                ViewBag.Country = CountryStateCityData.DrpForCountry();
+                List<StateModel> state = new List<StateModel>();
+                state = CountryStateCityData.GetState(id);
+                if (state.Count > 0)
+                {
+                    foreach (var stat in state)
+                    {
+                        stat.CountryName = CountryStateCityData.GetCountryNameFromID(stat.CountryID);
+                    }
+                }
+                return View(state);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateState(StateModel state)
+        {
+            try
+            {
+                ViewBag.Country = CountryStateCityData.DrpForCountry();
+
+                long CountryID = CountryStateCityData.GetCountryIDFromName(state.CountryName);
+                state.CountryID = CountryID;
+
+                CountryStateCityData.UpdateState(state);
+                return RedirectToAction("State");
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+
+        public ActionResult DeleteState(long id)
+        {
+            try
+            {
+                CountryStateCityData.DeleteState(id);
+                return RedirectToAction("State");
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion state
+        #region city
+        public ActionResult City()
+        {
+            try
+            {
+                ViewBag.State = CountryStateCityData.DrpForState();
+                List<CityModel> city = new List<CityModel>();
+                city = CountryStateCityData.GetAllCity();
+                if (city.Count > 0)
+                {
+                    foreach (var cit in city)
+                    {
+                        cit.StateName = CountryStateCityData.GetStateNameFromID(cit.StateID);
+                    }
+                }
+                return View(city);
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult City(CityModel city)
+        {
+            try
+            {
+                ViewBag.State = CountryStateCityData.DrpForState();
+
+                long StateID = CountryStateCityData.GetStateIDFromName(city.StateName);
+                city.StateID = StateID;
+
+                CountryStateCityData.AddCity(city);
+                return RedirectToAction("City");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult Updatecity(long id)
+        {
+            try
+            {
+                ViewBag.State = CountryStateCityData.DrpForState();
+                List<CityModel> city = new List<CityModel>();
+                city = CountryStateCityData.GetCity(id);
+                if (city.Count > 0)
+                {
+                    foreach (var cit in city)
+                    {
+                        cit.StateName = CountryStateCityData.GetStateNameFromID(cit.StateID);
+                    }
+                }
+                return View(city);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult Updatecity(CityModel city)
+        {
+            try
+            {
+                ViewBag.State = CountryStateCityData.DrpForState();
+
+                long StateID = CountryStateCityData.GetStateIDFromName(city.StateName);
+                city.StateID = StateID;
+
+                CountryStateCityData.UpdateCity(city);
+                return RedirectToAction("City");
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+
+        public ActionResult DeleteCity(long id)
+        {
+            try
+            {
+                CountryStateCityData.DeleteCity(id);
+                return RedirectToAction("City");
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion city
+        #region SkillSet
+        public ActionResult SkillSet()
+        {
+            try
+            {
+                List<SkillSetModel> skill = new List<SkillSetModel>();
+                skill = CountryStateCityData.GetAllSkillSet();
+                return View(skill);
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult SkillSet(SkillSetModel skill)
+        {
+            try
+            {
+
+                CountryStateCityData.AddSkillSet(skill);
+                return RedirectToAction("SkillSet");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateSkillSet(long id)
+        {
+            try
+            {
+                List<SkillSetModel> skill = new List<SkillSetModel>();
+                skill = CountryStateCityData.GetSkillSet(id);
+                return View(skill);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateSkillSet(SkillSetModel skill)
+        {
+            try
+            {
+                CountryStateCityData.UpdateSkillSet(skill);
+                return RedirectToAction("SkillSet");
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+
+        public ActionResult DeleteSkillSet(long id)
+        {
+            try
+            {
+                CountryStateCityData.DeleteSkillSet(id);
+                return RedirectToAction("SkillSet");
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion SkillSet
+        #region EmployeeDetails
+        public ActionResult EmployeeDetails()
+        {
+            try
+            {
+                ViewBag.Country = CountryStateCityData.DrpForCountry();
+                ViewBag.State = CountryStateCityData.DrpForState();
+                ViewBag.City = CountryStateCityData.DrpForCity();
+                ViewBag.SkillSet = CountryStateCityData.ChkForSkill();
+                List<EmployeeModel> employee = new List<EmployeeModel>();
+                employee = CountryStateCityData.GetAllEmployee();
+                if (employee.Count > 0)
+                {
+                    foreach (var name in employee)
+                    {
+                        name.CountryName = CountryStateCityData.GetCountryNameFromID(name.CountryID);
+                        name.StateName = CountryStateCityData.GetStateNameFromID(name.StateID);
+                        name.CityName = CountryStateCityData.GetCityNameFromID(name.CityID);
+                    }
+                } 
+                return View(employee);
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult EmployeeDetails(EmployeeModel employee, string[] SkillSetName, HttpPostedFileBase ImageName)
+        {
+            try
+            {
+                string skill = string.Join(",", SkillSetName);
+                employee.SkillSetName = skill;
+
+                string filename = Path.GetFileName(ImageName.FileName);
+                string paths = Server.MapPath("~/Uploads/");
+
+                if (!Directory.Exists(paths))
+                {
+                    Directory.CreateDirectory(paths);
+                }
+
+                paths = "~/Uploads/" + filename;
+                ImageName.SaveAs(Server.MapPath(paths));
+
+                employee.ImageName = filename;
+                employee.Attachment = paths;
+
+                ViewBag.Country = CountryStateCityData.DrpForCountry();
+                ViewBag.State = CountryStateCityData.DrpForState();
+                ViewBag.City = CountryStateCityData.DrpForCity();
+                ViewBag.SkillSet = CountryStateCityData.ChkForSkill();
+
+                long CountryID = CountryStateCityData.GetCountryIDFromName(employee.CountryName);
+                employee.CountryID = CountryID;
+
+                long StateID = CountryStateCityData.GetStateIDFromName(employee.StateName);
+                employee.StateID = StateID;
+
+                long CityID = CountryStateCityData.GetCityIDFromName(employee.CityName);
+                employee.CityID = CityID;
+
+                CountryStateCityData.AddEmployee(employee);
+                return RedirectToAction("EmployeeDetails");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateEmployeeDetails(long id)
+        {
+            try
+            {
+                ViewBag.Country = CountryStateCityData.DrpForCountry();
+                ViewBag.State = CountryStateCityData.DrpForState();
+                ViewBag.City = CountryStateCityData.DrpForCity();
+                ViewBag.SkillSet = CountryStateCityData.ChkForSkill();
+                List<EmployeeModel> employee = new List<EmployeeModel>();
+                employee = CountryStateCityData.GetEmployee(id);
+                if (employee.Count > 0)
+                {
+                    foreach (var name in employee)
+                    {
+                        name.CountryName = CountryStateCityData.GetCountryNameFromID(name.CountryID);
+                        name.StateName = CountryStateCityData.GetStateNameFromID(name.StateID);
+                        name.CityName = CountryStateCityData.GetCityNameFromID(name.CityID);
+                    }
+                }
+                return View(employee);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateEmployeeDetails(EmployeeModel employee, string[] SkillSetName, HttpPostedFileBase ImageName)
+        {
+            try
+            {
+
+                 string skill = string.Join(",", SkillSetName);
+                employee.SkillSetName = skill;
+
+                string filename = Path.GetFileName(ImageName.FileName);
+                string paths = Server.MapPath("~/Uploads/");
+
+                if (!Directory.Exists(paths))
+                {
+                    Directory.CreateDirectory(paths);
+                }
+
+                paths = "~/Uploads/" + filename;
+                ImageName.SaveAs(Server.MapPath(paths));
+
+                employee.ImageName = filename;
+                employee.Attachment = paths;
+
+                ViewBag.Country = CountryStateCityData.DrpForCountry();
+                ViewBag.State = CountryStateCityData.DrpForState();
+                ViewBag.City = CountryStateCityData.DrpForCity();
+                ViewBag.SkillSet = CountryStateCityData.ChkForSkill();
+
+                long CountryID = CountryStateCityData.GetCountryIDFromName(employee.CountryName);
+                employee.CountryID = CountryID;
+
+                long StateID = CountryStateCityData.GetStateIDFromName(employee.StateName);
+                employee.StateID = StateID;
+
+                long CityID = CountryStateCityData.GetCityIDFromName(employee.CityName);
+                employee.CityID = CityID;
+
+                CountryStateCityData.UpdateEmployee(employee);
+                return RedirectToAction("EmployeeDetails");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion EmployeeDetails
+    }
+}
