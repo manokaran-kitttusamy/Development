@@ -1,0 +1,400 @@
+@model IEnumerable<CountryStateCity.Models.EmployeeModel>
+@{
+    ViewBag.Title = "EmployeeDetails";    
+}
+
+<h2>EmployeeDetails</h2>
+
+<link href="~/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/bootstrap/js/bootstrap.min.js"></script>
+
+
+@using (Html.BeginForm("EmployeeDetails", "CountryStatecity", FormMethod.Post, new { @id = "empdetform",@enctype = "multipart/form-data"}))
+{
+    <table>
+        <tr>
+            <td>@Html.Label("User Name", new { @id = "lblusername" })</td>
+            <td>@Html.TextBox("UserName", "", new { @id = "UserName", @name = "UserName"})</td>
+        </tr>
+        <tr>
+            <td>@Html.Label("PassWord", new { @id = "lblpswd" })</td>
+            <td>@Html.Password("PassWord", "", new { @id = "PassWord", @name = "PassWord" })</td>
+        </tr>
+        <tr>
+            <td>@Html.Label("ReType-PassWord", new { @id = "lblrepswd" })</td>
+            <td>@Html.Password("ReTypePassWord", "", new { @id = "ReTypePassWord", @name = "ReTypePassWord" })</td>
+        </tr>
+        <tr>
+            <td>@Html.Label("Country Name", new { @id = "lblcountryname" })</td>
+            <td>@Html.DropDownList("CountryName", ViewBag.Country as IEnumerable<SelectListItem>, new { @id = "CountryName", @name = "CountryName" })</td>
+        </tr>
+        <tr>
+            <td>@Html.Label("State Name", new { @id = "lblstatename" })</td>
+            <td>@Html.DropDownList("StateName", ViewBag.State as IEnumerable<SelectListItem>, new { @id = "State", @name = "State" })</td>
+        </tr>
+        <tr>
+            <td>@Html.Label("City Name", new { @id = "lblcityname" })</td>
+            <td>@Html.DropDownList("CityName", ViewBag.City as IEnumerable<SelectListItem>, new { @id = "City", @name = "City" })</td>
+        </tr>
+        <tr>
+            <td>@Html.Label("SkillSet Name", new { @id = "lblskillset" })</td>
+            <td>
+                @foreach (var items in ViewBag.SkillSet)
+                {
+    <input type="checkbox" id="@items.Text" name="SkillSetName" value="@items.Text"/>@items.Text
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>@Html.Label("Date of Birth", new { @id = "lbldob" })</td>
+            <td>@Html.TextBox("DateOfBirth", "", new { @id = "DateOfBirth", @name = "DateOfBirth" ,@placeholder = "YYYY-MM-DD"})</td>
+        </tr>
+        <tr>
+            <td>@Html.Label("Sex", new { @id = "lblSex" })</td>
+            <td>@Html.RadioButton("Sex", "Male", true, new { @id = "Male", @checked = "checked", @name = "Male" })
+                @Html.Label("Male", new { @id = "lblmale" })
+                @Html.RadioButton("Sex", "FeMale", false, new { @id = "FeMale", @name = "FeMale" })
+                @Html.Label("FeMale", new { @id = "lblfmale" })
+            </td>            
+        </tr>
+        <tr>
+            <td>@Html.Label("MobileNo", new { @id = "lblSex" })</td>
+            <td>@Html.TextBox("MobileNo", "", new { @id = "MobileNo", @maxlength = "10", @name = "MobileNo" })</td>
+        </tr>
+        <tr>
+            <td>@Html.Label("EmailID", new { @id = "lblSex" })</td>
+            <td>@Html.TextBox("EmailID", "", new { @id = "EmailID", @name = "EmailID" })</td>
+        </tr>
+        <tr>
+            <td>@Html.Label("CurrentStatus", new { @id = "lblSex" })</td>
+            <td>@Html.RadioButton("CurrentStatus", "Active", true, new { @id = "Active", @checked = "checked", @name = "Active" })
+                @Html.Label("Active", new { @id = "lblact" })
+                @Html.RadioButton("CurrentStatus", "InActive", false, new { @id = "InActive", @name = "InActive" })
+                @Html.Label("InActive", new { @id = "lblinact" })</td>
+        </tr>
+        <tr>
+            <td>@Html.Label("Description", new { @id = "lblSex" })</td>
+            <td>@Html.TextArea("Description", "", new { @id = "Description", @name = "Description" })</td>
+        </tr>
+        <tr>
+            <td>@Html.Label("Attachment", new { @id = "lblSex" })</td>
+            <td>
+                <input type="file" name="ImageName"></td>
+        </tr>
+    </table>
+    <input type="submit" id="Save" name="Save" value="Save" />
+    <input type="reset" id="Clear" name="Clear" value="Clear" />
+}
+<br />
+
+@* POPUP FOR TABLE *@
+<button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#myModal" style="float:right" onclick="showpopup()">
+    View More
+</button>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+     aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div>
+                <table border="1" style="width:500px;">
+                    <tr>      
+                        <td>EmployeeName</td>                
+                        <td>CountryName</td>
+                        <td>StateName</td>
+                        <td>CityName</td>                        
+                        <td>Sex</td>                                            
+                    </tr>
+                    @foreach (var items in Model)
+                    {
+                        <tr>                          
+                            <td>@items.UserName</td>
+                            <td>@items.CountryName</td>
+                            <td>@items.StateName</td>
+                            <td>@items.CityName</td>
+                            <td>@items.Sex</td>                                                   
+                        </tr>
+                    }
+                </table>
+
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+
+</div><!-- /.modal -->
+
+@*<input type="button" onclick="showpopup()" value="View More" style="float:right"/>*@
+<br/>
+<br/>
+    <div>
+        @*<table border="1">
+            <tr>
+                <td>S.No</td>
+                <td>UserName</td>
+                <td>PassWord</td>
+                  <td>ReTypePassWord</td>
+                <td>CountryName</td>
+                <td>StateName</td>
+                <td>CityName</td>
+                <td>SkillSetName</td>
+                <td>Sex</td>
+                <td>MobileNo</td>
+                <td>EmailID</td>
+                <td>CurrentStatus</td>
+                <td>Description</td>
+                <td>Attachment</td>
+                <td colspan="2">Actions</td>
+            </tr>
+            @foreach (var items in Model)
+            {
+                <tr>
+                    <td>@items.RegistrationID</td>
+                    <td>@items.UserName</td>
+                    <td>@items.PassWord</td>
+                        <td>@items.PassWord</td>
+                    <td>@items.CountryName</td>
+                    <td>@items.StateName</td>
+                    <td>@items.CityName</td>
+                    <td>@items.SkillSetName</td>
+                    <td>@items.Sex</td>
+                    <td>@items.MobileNo</td>
+                    <td>@items.EmailID</td>
+                    <td>@items.CurrentStatus</td>
+                    <td>@items.Description</td>
+                    <td>@items.Attachment</td>
+                    <td>@Html.ActionLink("Edit", "UpdateEmployeeDetails", new { @id = items.RegistrationID })</td>
+                    <td>@Html.ActionLink("Delete", "DeleteCountry", new { @id = items.RegistrationID })</td>
+                </tr>
+            }
+        </table>*@
+    </div>
+
+
+
+@* for valiadtion plugins *@
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6/jquery.min.js" type="text/javascript"></script>
+<script src="~/Js/lib/jquery.js"></script>
+<script src="~/Js/lib/jquery-3.1.1.js"></script>
+<script src="~/Js/dist/jquery.validate.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js" type="text/javascript"></script>
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="Stylesheet" type="text/css" />
+
+
+<script>
+    $(document).ready(function () {
+        $("#DateOfBirth").datepicker();
+        //$.validator.setDefaults({
+        //    submitHandler: function () {
+        //        alert("submitted");
+        //    }
+        //});        
+        $("#empdetform").validate({
+            rules: {
+                UserName: "required",
+                PassWord: {
+                    required: true,
+                    minlength: 6
+                },
+                ReTypePassWord: {
+                    required: true,
+                    minlength: 6,
+                    equalTo: "#PassWord"
+                },
+                DateOfBirth: {
+                    required: true,
+                    date: true                    
+                },
+                MobileNo: {
+                    required: true,
+                    digits: true,
+                    minlength: 10,
+                    maxlength: 10
+                },
+                EmailID: {
+                    required: true,
+                    email: true
+                },
+                CountryName: "required",
+                State: "required",
+                City: "required",
+                Description: "required",
+            },
+            messages: {
+                UserName: "please enter username",
+                PassWord: {
+                    required: "please enter password",
+                    minlength: "length must be 6"
+                },
+                ReTypePassWord: {
+                    required: "plaese enter re-type password",
+                    minlength: "length must be 6",
+                    equalTo: "password can't matched"
+                },
+                DateOfBirth: {
+                    required: "please enter the D.O.B",
+                    date: "type proper date format"
+                },
+                MobileNo: {
+                    required: "please enter the mobile number",
+                    digits: "enter numeric values only",
+                    minlength: "length must be 10",
+                    maxlength: "length is more than 10"
+                },
+                EmailID: {
+                    required: "please enter the email address",
+                    email: "your email is inavlid"
+                },
+                CountryName: "please select the country name",
+                State: "please select the state name",
+                City: "please select the city name",
+                Description_Comments: "please enter the comments",
+            }
+        });
+
+        //$("#CountryName").change(function () {
+        //    debugger;
+
+        //    $("#State, #City").find("option:gt(0)").remove();
+        //    $("#State").find("option:first").text("Loading...");
+
+        //    $.ajax({
+        //        type: "GET",
+        //        url: '/CountryStatecity/LoadStateBasedonCountry/',
+        //        data: { countryName: $(this).val() },
+        //        dataType: 'json',
+        //        async: false,
+        //        cache: false,
+        //        success: function (data) {
+        //            debugger;
+        //            alert(data[0].StateName);
+
+        //            $("#State").find("option:first").text("---select---");
+
+        //            for (var i = 0; i < data.length; i++) {
+        //                $("<option/>").attr("value", data[i].StateName).text((data[i].StateName)).appendTo($("#State"));
+        //            }
+        //        },
+        //        error: function (xhr, status) {
+        //            alert(xhr + "" + status);
+        //        },
+        //    });
+        //});
+
+        //$("#State").change(function () {
+        //    var stateid = $("#State").val();
+
+        //    $("#City").find("option:gt(0)").remove();
+        //    $("#City").find("option:first").text("Loading...");
+
+        //    $.ajax({
+        //        type: "GET",
+        //        url: '/CountryStatecity/GetCity',
+        //        data: { Id: $(this).val() },
+        //        dataType: 'json',
+        //        async: false,
+        //        cache: false,
+        //        success: function (data) {
+        //            debugger;
+        //            //alert(data[0].CityName);
+
+        //            $("#City").find("option:first").text("---select---");
+
+        //            for (var i = 0; i < data.length; i++) {
+        //                $("<option/>").attr("value", data[i].CityName).text(data[i].CityName).appendTo($("#City"));
+        //            }
+        //        },
+        //        error: function (xhr) {
+        //        },
+
+        //    });
+        //});
+
+
+
+    });
+
+    function showpopup() {
+        $("#divcontaipop").dialog({
+            height: 400,
+            width: 500,
+            modal: true,
+            buttons: {
+                "Ok": function () {
+                    $(this).dialog("close");
+                    alert("you selected ok!!");
+                },
+                "Cancel": function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+    }
+
+
+    $(document).ready(function () {
+
+        $("#CountryName").change(function () {
+            debugger;
+
+            $("#State, #City").find("option:gt(0)").remove();
+            $("#State").find("option:first").text("Loading...");
+
+            $.ajax({
+                type: "GET",
+                url: '/CountryStatecity/LoadStateBasedonCountry/',
+                data: { countryName: $(this).val() },
+                dataType: 'json',
+                async: false,
+                cache: false,
+                success: function (data) {
+                    debugger;
+                    //alert(data[0].StateName);
+
+                    $("#State").find("option:first").text("---select---");
+
+                    for (var i = 0; i < data.length; i++) {
+                        $("<option/>").attr("value", data[i].StateName).text((data[i].StateName)).appendTo($("#State"));
+                    }
+                },
+                error: function (xhr, status) {
+                    alert(xhr + "" + status);
+                },
+            });
+        });
+
+
+        $("#State").change(function () {
+            debugger;
+
+
+            $.ajax({
+                type: 'GET',
+                url: '/CountryStatecity/GetCity',
+                data: { Id: $("#State").val() },
+                dataType: 'json',
+                async: false,
+                cache: false,
+                success: function (data) {
+                    $("#City").find("option:first").text("---select---");
+
+                    for (var i = 0; i < data.length; i++) {
+                        $("<option/>").attr("value", data[i].CityName).text((data[i].CityName)).appendTo($("#City"));
+                    }
+                },
+                error: function(xhr, status)
+                {
+
+                }
+            });
+
+        });
+    })
+</script>
+
+<style>
+    .error {
+    color:red;
+    }
+</style>
