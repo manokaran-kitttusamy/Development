@@ -1,0 +1,119 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Data;
+using System.Data.Entity.Core.Objects;
+using System.Data.Entity.Core.Objects.DataClasses;
+using System.Data.SqlClient;
+using System.ComponentModel.DataAnnotations;
+using CRUDinSP.DAL;
+using CRUDinSP.Models;
+using CRUDinSP.Controllers;
+
+namespace CRUDinSP.CRUDDataObjects
+{
+    public class CRUDdata
+    {
+        public static CRUDinSPEntities db = new CRUDinSPEntities();
+
+        public static List<EmployeeModel> GetEmployees()
+        {
+            try
+            {
+                List<EmployeeModel> employee = (from i in db.EmployeeMasters
+                                                where i.IsDelete == false
+                                                select new
+                                                {
+                                                    EmployeeID = i.EmployeeID,
+                                                    EmployeeName = i.EmployeeName,
+                                                    Employeedescription = i.Employeedescription,
+                                                    IsDelete  = i.IsDelete
+
+                                                }).Select(j => new EmployeeModel()
+                                                    {
+                                                        EmployeeID = j.EmployeeID,
+                                                        EmployeeName = j.EmployeeName,
+                                                        Employeedescription = j.Employeedescription,
+                                                        IsDelete = j.IsDelete
+                                                    }).ToList();
+
+                return employee;
+            }
+            catch (Exception ex)
+            {   
+                throw ex;
+            }
+        }
+        public static void AddEmployee(EmployeeModel employee)
+        {
+            try
+            {
+                System.Data.Entity.Core.Objects.ObjectParameter obj = new System.Data.Entity.Core.Objects.ObjectParameter("EmployeeID", employee.EmployeeID);
+                db.Insert_Employee(employee.EmployeeName,employee.Employeedescription);                
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public static List<EmployeeModel> GetEmployee(long id)
+        {
+            try
+            {
+                List<EmployeeModel> employee = (from i in db.EmployeeMasters
+                                                where i.IsDelete == false
+                                                && i.EmployeeID == id
+                                                select new
+                                                {
+                                                    EmployeeID = i.EmployeeID,
+                                                    EmployeeName = i.EmployeeName,
+                                                    Employeedescription = i.Employeedescription,
+                                                    IsDelete = i.IsDelete
+                                                }
+                                                    ).Select(j => new EmployeeModel()
+                                                    {
+                                                        EmployeeID = j.EmployeeID,
+                                                        EmployeeName = j.EmployeeName,
+                                                        Employeedescription = j.Employeedescription,
+                                                        IsDelete = j.IsDelete
+                                                    }).ToList();
+
+                return employee;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public static void UpdateEmployee(EmployeeModel employee)
+        {
+            try
+            {   
+                System.Data.Entity.Core.Objects.ObjectParameter obj = new System.Data.Entity.Core.Objects.ObjectParameter("EmployeeID",employee.EmployeeID);
+                db.Update_Employee(employee.EmployeeID,employee.EmployeeName, employee.Employeedescription);
+            }
+            catch (Exception ex)
+            {                
+                throw ex;
+            }
+        }
+
+        public static void DeleteEmployee(long id)
+        {
+            try
+            {
+                System.Data.Entity.Core.Objects.ObjectParameter obj = new System.Data.Entity.Core.Objects.ObjectParameter("EmployeeID", id);
+                db.Delete_Employee(id);
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+
+        }
+    }    
+}
