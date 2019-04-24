@@ -1,0 +1,279 @@
+@model IEnumerable<Test3.Models.EmployeeDetailModel>
+@{
+    ViewBag.Title = "NewEmployee";
+}
+
+@Html.ActionLink("Login", "EmployeeLogin", null, new { style = "color:blue" })<br /><br />
+
+<h2>NewEmployee</h2>
+
+@using (Html.BeginForm("NewEmployee", "Test3", FormMethod.Post, new { @id = "employeeform", enctype = "multipart/form-data" }))
+{
+    <table>
+        <tr>
+            <td>@Html.Label("UserName", new { @id = "lblusername", style = "color:black" })</td>
+            <td><input type="text" id="UserName" name="UserName"></td>
+        </tr>
+        <tr>
+            <td>@Html.Label("PassWord", new { @id = "lblpswd", style = "color:black" })</td>
+            <td><input type="password" id="PassWord" name="PassWord"></td>
+        </tr>
+        <tr>
+            <td>@Html.Label("CountryName", new { @id = "lblcountryname", style = "color:black" })</td>
+            <td id="tdcountry">@Html.DropDownList("CountryName", ViewBag.Country as IEnumerable<SelectListItem>, new { @id = "drpempdetcountryname" })</td>
+        </tr>
+        <tr>
+            <td>@Html.Label("StateName", new { @id = "lblstatename", style = "color:black" })</td>
+            <td id="tdstate">@Html.DropDownList("StateName", ViewBag.State as IEnumerable<SelectListItem>, new { @id = "drpempdetstatename" })</td>
+        </tr>
+        <tr>
+            <td>@Html.Label("CityName", new { @id = "lblcityname", style = "color:black" })</td>
+            <td id="tdcity">@Html.DropDownList("CityName", ViewBag.City as IEnumerable<SelectListItem>, new { @id = "drpempdetcityname" })</td>
+        </tr>
+        <tr>
+            <td>@Html.Label("Skill Set Name", new { @id = "lblskill", style = "color:black" })</td>
+            <td id="tdskill">
+                @foreach (var item in ViewBag.Skillset)
+                {
+                    <input type="checkbox" id="@item.Text" name="SkillSetName" value="@item.Text" />@item.Text
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>@Html.Label("DateOfBirth", new { @id = "lbldob", style = "color:black" })</td>
+            <td>@Html.TextBox("DateOfBirth", "", new { @id = "DateOfBirth", @placeholder = "YYYY-MM-DD" })</td>
+        </tr>
+        <tr>
+            <td>
+                @Html.Label("Sex", new { @id = "lblsex", style = "color:black" })
+                @Html.RadioButton("Sex", "Male", true, new { @id = "rdmale" })
+                @Html.Label("Male", new { @id = "lblmale", style = "color:black" })
+                @Html.RadioButton("Sex", "FeMale", false, new { @id = "rdfemale" })
+                @Html.Label("FeMale", new { @id = "lblfemale", style = "color:black" })
+            </td>
+        </tr>
+        <tr>
+            <td>@Html.Label("MobileNo", new { @id = "lblmobno", style = "color:black" })</td>
+            <td>
+                @Html.TextBox("MobileNo", "", new
+           {
+               @id = "MobileNo",
+               @maxlength = "10"@*, @required = "required", @pattern = @"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", @title = "please enter valid mobile number"*@ })
+            </td>
+        </tr>
+        <tr>
+            <td>@Html.Label("EmailID", new { @id = "lblemail", style = "color:black" })</td>
+            <td>
+                @Html.TextBox("EmailID", "", new
+           {
+               @id = "EmailID"@*, @required = "required", @pattern = "^[a-zA-Z0-9_\\.-]+@([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$", @title = "please enter valid email address"*@ })
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.Label("Current Status", new { @id = "lblcursts", style = "color:black" })
+                @Html.RadioButton("CurrentStatus", "Active", true, new { @id = "rdact" })
+                @Html.Label("Active", new { @id = "lblact", style = "color:black" })
+                @Html.RadioButton("CurrentStatus", "InActive", false, new { @id = "rdinact" })
+                @Html.Label("InActive", new { @id = "lblInact", style = "color:black" })
+            </td>
+        </tr>
+        <tr>
+            <td>@Html.Label("Description", new { @id = "lblDesc", style = "color:black" })</td>
+            <td>@Html.TextArea("Description", new { @id = "Description" })</td>
+        </tr>
+        <tr>
+            <td style="color:black">
+                @Html.Label("Attachment", new { @id = "lblattach", style = "color:black" })
+                <input type="file" name="ImagePath" />
+            </td>
+        </tr>
+    </table>
+    <br />
+    <input type="submit" name="save" id="save" value="Submit" />
+    <input type="reset" name="cancel" id="cancel" value="Clear" />
+
+}
+
+<br />
+
+@* for valiadtion plugins *@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Validation-Engine/2.6.4/validationEngine.jquery.css"></script>
+<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/smoothness/jquery-ui.css" />
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Validation-Engine/2.6.4/languages/jquery.validationEngine-en.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jQuery-Validation-Engine/2.6.4/jquery.validationEngine.js"></script>
+
+@*<script src="~/Js/jquery.js"></script>
+<script src="~/Js/jquery-3.1.1.js"></script>*@
+<script src="~/Js/jquery.validate.js"></script>
+
+<script>
+    $(document).ready(function () {
+        //$.validator.setDefaults({
+        //    submitHandler: function () {
+        //        alert("Submitted");
+        //    }
+        //});
+        $("#DateOfBirth").datepicker();
+
+        $("#employeeform").validate({
+            rules: {
+                UserName: "required",
+                PassWord: {
+                    required: true,
+                    minlength: 6
+                },
+                ConfirmPassWord: {
+                    required: true,
+                    minlength: 6,
+                    equalTo: "#PassWord"
+                },
+                DateOfBirth: {
+                    required: true,
+                    date: true
+                },
+                MobileNo: {
+                    required: true,
+                    digits: true,
+                    minlength: 10,
+                    maxlength: 10,
+                },
+                EmailID: {
+                    required: true,
+                    email: true
+                },
+                CountryName: "required",
+                StateName: "required",
+                CityName: "required",
+                Description: "required",
+            },
+            messages: {
+                UserName: "please enter the username",
+                PassWord: {
+                    required: "please enter the password",
+                    minlength: "length must be 6"
+                },
+                ConfirmPassWord: {
+                    required: "please enter the confirm-password",
+                    minlength: "length must be 6",
+                    equalTo: "password can't matched"
+                },
+                DateOfBirth: {
+                    required: "please enter the D.O.B",
+                    date: "type proper date format"
+                },
+                MobileNo: {
+                    required: "please enter the mobile number",
+                    digits: "enter numeric values only",
+                    minlength: "length must be 10",
+                    maxlength: "length is more than 10"
+                },
+                EmailID: {
+                    required: "please enter the email address",
+                    email: "your email is inavlid"
+                },
+                CountryName: "please select the country name",
+                StateName: "please select the state name",
+                CityName: "please select the city name",
+                Description: "please enter the comments",
+            }
+        });
+    });
+
+    $("#drpempdetcountryname").change(function () {
+        debugger;
+
+        $("#drpempdetstatename, #drpempdetcityname").find("option:gt(0)").remove();
+        $("#drpempdetstatename").find("option:first").text("Loading...");
+
+        var ctryId = $(this).val();
+        //alert(ctryId);
+
+        $.ajax({
+            type: "GET",
+            url: '/Test3/LoadStateBasedonCountry/',
+            data: { Id: ctryId },
+            dataType: 'json',
+            async: false,
+            cache: false,
+            success: function (data) {
+                debugger;
+                //alert(data[0].StateID, data[0].StateName);
+
+                $("#drpempdetstatename").find("option:first").text("");
+
+                for (var i = 0; i < data.length; i++) {
+                    $("<option/>").attr("value", data[i].StateName).text(data[i].StateName).appendTo($("#drpempdetstatename"));
+                }
+            },
+            error: function (xhr, status) {
+                alert(xhr + "" + status);
+            },
+        });
+    });
+
+    $("#drpempdetstatename").change(function () {
+        $("#drpempdetcityname").find("option:gt(0)").remove();
+        $("#drpempdetcityname").find("option:first").text("Loading...");
+        $.ajax({
+            type: "GET",
+            url: '/Test3/GetCity',
+            data: { Id: $("#drpempdetstatename").val() },
+            dataType: 'json',
+            async: false,
+            cache: false,
+            success: function (data) {
+                debugger;
+                //alert(data[0].CityID, data[0].CityName);
+
+                $("#drpempdetcityname").find("option:first").text("");
+
+                for (var i = 0; i < data.length; i++) {
+                    $("<option/>").attr("value", data[i].CityName).text(data[i].CityName).appendTo($("#drpempdetcityname"));
+                }
+            },
+            error: function (xhr) {
+            },
+        });
+    });
+</script>
+<style>
+    .error {
+        color: red;
+    }
+
+    #tbl1 {
+        background-color: white;
+    }
+
+    #tr1 {
+        color: blue;
+    }
+
+    #tr2 {
+        color: black;
+    }
+
+    #employeeform {
+        background-color: white;
+    }
+
+    #tdskill {
+        color: black;
+    }
+
+    #tdcountry {
+        color: red;
+    }
+
+    #tdcity {
+        color: red;
+    }
+
+    #tdstate {
+        color: red;
+    }
+</style>
