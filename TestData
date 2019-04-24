@@ -1,0 +1,1137 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Data;
+using System.Data.SqlClient;
+using System.ComponentModel.DataAnnotations;
+using Test3.DAL;
+using Test3.Controllers;
+using Test3.Models;
+
+namespace Test3.Test3DataObjects
+{
+    public class Test3Data
+    {
+        public static Test3Entities db = new Test3Entities();
+        #region country
+        public static List<CountryModel> GetAllCountry()
+        {
+            try
+            {
+                List<CountryModel> country = (from i in db.CountryMasters
+                                              where i.IsDelete == false
+                                              select new
+                                              {
+                                                  CountryID = i.CountryID,
+                                                  CountryName = i.CountryName,
+                                                  CountryDescription = i.CountryDescription,
+                                                  IsDelete = i.IsDelete
+                                              }).Select(j => new CountryModel()
+                                              {
+                                                  CountryID = j.CountryID,
+                                                  CountryName = j.CountryName,
+                                                  CountryDescription = j.CountryDescription,
+                                                  IsDelete = j.IsDelete
+
+                                                  }).ToList();
+                return country;
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+
+        }
+        public static List<CountryModel> GetCountry(long id)
+        {
+            try
+            {
+                List<CountryModel> country = (from i in db.CountryMasters
+                                              where i.IsDelete == false 
+                                              && i.CountryID == id
+                                              select new
+                                              {
+                                                  CountryID = i.CountryID,
+                                                  CountryName = i.CountryName,
+                                                  CountryDescription = i.CountryDescription,
+                                                  IsDelete = i.IsDelete
+                                              }).Select(j => new CountryModel()
+                                              {
+                                                  CountryID = j.CountryID,
+                                                  CountryName = j.CountryName,
+                                                  CountryDescription = j.CountryDescription,
+                                                  IsDelete = j.IsDelete
+
+                                              }).ToList();
+                return country;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+        public static void AddCountry(CountryModel country)
+        {
+            try
+            {
+                CountryMaster count = new CountryMaster();
+                count.CountryName = country.CountryName;
+                count.CountryDescription = country.CountryDescription;
+                count.IsDelete = false;
+
+                db.CountryMasters.Add(count);
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        public static void UpdateCountry(CountryModel country)
+        {
+            try
+            {
+                var count = db.CountryMasters.Where(i => i.IsDelete == false && i.CountryID == country.CountryID).ToList();
+
+                if (count.Count > 0)
+                {
+                    foreach (var items in count)
+                    {
+                        items.CountryName = country.CountryName;
+                        items.CountryDescription = country.CountryDescription;
+                        items.IsDelete = country.IsDelete;
+
+                        db.SaveChanges();
+                    }
+                }              
+                
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static void DeleteCountry(long id)
+        {
+            try
+            {
+                var count = db.CountryMasters.Where(i => i.IsDelete == false && i.CountryID == id).ToList();
+
+                if (count.Count > 0)
+                {
+                    foreach (var items in count)
+                    {                        
+                        items.IsDelete =true;
+
+                        db.SaveChanges();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion country
+        #region state
+        public static List<StateModel> GetAllState()
+        {
+            try
+            {
+                List<StateModel> state = (from i in db.StateMasters
+                                              where i.IsDelete == false
+                                              select new
+                                              {
+                                                  StateID = i.StateID,
+                                                  StateName = i.StateName,
+                                                  CountryID  = i.CountryID,
+                                                  StateDescription = i.StateDescription,
+                                                  IsDelete = i.IsDelete
+                                              }).Select(j => new StateModel()
+                                              {
+                                                  StateID = j.StateID,
+                                                  StateName =j.StateName,
+                                                  CountryID = j.CountryID,
+                                                  StateDescription = j.StateDescription,
+                                                  IsDelete = j.IsDelete
+
+                                              }).ToList();
+                return state;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+        public static List<StateModel> GetState(long id)
+        {
+            try
+            {
+                List<StateModel> state = (from i in db.StateMasters
+                                          where i.IsDelete == false && i.StateID == id
+                                          select new
+                                          {
+                                              StateID = i.StateID,
+                                              StateName = i.StateName,
+                                              CountryID = i.CountryID,
+                                              StateDescription = i.StateDescription,
+                                              IsDelete = i.IsDelete
+                                          }).Select(j => new StateModel()
+                                          {
+                                              StateID = j.StateID,
+                                              StateName = j.StateName,
+                                              CountryID = j.CountryID,
+                                              StateDescription = j.StateDescription,
+                                              IsDelete = j.IsDelete
+
+                                          }).ToList();
+                return state;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+        public static void AddState(StateModel state)
+        {
+            try
+            {
+                StateMaster stat = new StateMaster();
+                stat.StateName = state.StateName;
+                stat.CountryID = state.CountryID;
+                stat.StateDescription = state.StateDescription;
+                stat.IsDelete = false;
+
+                db.StateMasters.Add(stat);
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static void UpdateState(StateModel state)
+        {
+            try
+            {
+                var count = db.StateMasters.Where(i => i.IsDelete == false && i.StateID == state.StateID).ToList();
+
+                if (count.Count > 0)
+                {
+                    foreach (var items in count)
+                    {
+                        items.StateName = state.StateName;
+                        items.StateDescription = state.StateDescription;
+                        items.CountryID = state.CountryID;
+                        items.IsDelete = state.IsDelete;
+
+                        db.SaveChanges();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static void DeleteState(long id)
+        {
+            try
+            {
+                var count = db.StateMasters.Where(i => i.IsDelete == false && i.StateID == id).ToList();
+
+                if (count.Count > 0)
+                {
+                    foreach (var items in count)
+                    {
+                        items.IsDelete = true;
+
+                        db.SaveChanges();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static List<SelectListItem> DrpCountry()
+        {
+            try
+            {
+                List<SelectListItem> country = (from i in db.CountryMasters
+                                                where i.IsDelete == false
+                                                select new
+                                                {
+                                                    CountryID = i.CountryID,
+                                                    CountryName = i.CountryName,
+                                                   CountryDescription = i.CountryDescription,
+                                                    IsDelete = i.IsDelete
+
+                                                }).Select(j => new SelectListItem()
+                                                    {
+                                                        Text = j.CountryName,
+                                                        Value = j.CountryName
+                                                    }).ToList();
+
+                SelectListItem select = new SelectListItem();
+                select.Text = "---select---";
+                select.Value = "";
+                country.Insert(0, select);
+                return country;
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        public static string GetCountryNameFromID(long id)
+        {
+            try
+            {
+                string Name = "";
+                var country = db.CountryMasters.Where(i => i.IsDelete == false && i.CountryID == id).ToList();
+
+                if (country.Count > 0)
+                {
+                    foreach (var items in country)
+                    {
+                        Name = items.CountryName;
+                    }
+                }
+                return Name;
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        public static long GetCountrtyIDFromName(string countryname)
+        {
+            try
+            {
+                long CountryID = 0;
+                var country = db.CountryMasters.Where(i => i.IsDelete == false && i.CountryName == countryname).ToList();
+                if (country.Count > 0)
+                {
+                    foreach (var items in country)
+                    {
+                        CountryID = items.CountryID;
+                    }
+                }
+                return CountryID;
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        #endregion state
+        #region city
+        public static List<CityModel> GetAllCity()
+        {
+            try
+            {
+                List<CityModel> state = (from i in db.CityMasters
+                                          where i.IsDelete == false
+                                          select new
+                                          {
+                                              CityID = i.CityID,
+                                              StateID = i.StateID,
+                                              CityName = i.CityName,
+                                              CityDescription = i.CityDescription,
+                                              IsDelete = i.IsDelete
+                                          }).Select(j => new CityModel()
+                                          {
+
+                                              CityID = j.CityID,
+                                              StateID = j.StateID,
+                                              CityName = j.CityName,
+                                              CityDescription = j.CityDescription,
+                                              IsDelete = j.IsDelete
+
+                                          }).ToList();
+                return state;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+        public static List<CityModel> GetCity(long id)
+        {
+            try
+            {
+                List<CityModel> state = (from i in db.CityMasters
+                                         where i.IsDelete == false && i.CityID == id
+                                         select new
+                                         {
+                                             CityID = i.CityID,
+                                             StateID = i.StateID,
+                                             CityName = i.CityName,
+                                             CityDescription = i.CityDescription,
+                                             IsDelete = i.IsDelete
+                                         }).Select(j => new CityModel()
+                                         {
+
+                                             CityID = j.CityID,
+                                             StateID = j.StateID,
+                                             CityName = j.CityName,
+                                             CityDescription = j.CityDescription,
+                                             IsDelete = j.IsDelete
+
+                                         }).ToList();
+                return state;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+        public static void AddCity(CityModel city)
+        {
+            try
+            {
+                CityMaster cit = new CityMaster();
+                cit.CityName = city.CityName;
+                cit.StateID = city.StateID;
+                cit.CityDescription = city.CityDescription;
+                cit.IsDelete = false;
+
+                db.CityMasters.Add(cit);
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static void UpdateCity(CityModel city)
+        {
+            try
+            {
+                var count = db.CityMasters.Where(i => i.IsDelete == false && i.CityID == city.CityID).ToList();
+
+                if (count.Count > 0)
+                {
+                    foreach (var items in count)
+                    {
+                        items.CityName = city.CityName;
+                        items.CityDescription = city.CityDescription;
+                        items.StateID = city.StateID;
+                        items.IsDelete = city.IsDelete;
+
+                        db.SaveChanges();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static void DeleteCity(long id)
+        {
+            try
+            {
+                var count = db.CityMasters.Where(i => i.IsDelete == false && i.CityID == id).ToList();
+
+                if (count.Count > 0)
+                {
+                    foreach (var items in count)
+                    {
+                        items.IsDelete = true;
+
+                        db.SaveChanges();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static List<SelectListItem> DrpState()
+        {
+            try
+            {
+                List<SelectListItem> state = (from i in db.StateMasters
+                                                where i.IsDelete == false
+                                                select new
+                                                {
+                                                    StateName = i.StateName,
+                                                    StateDescription = i.StateDescription,
+                                                    CountryID = i.CountryID,                                                 
+                                                    IsDelete = i.IsDelete
+
+                                                }).Select(j => new SelectListItem()
+                                                {
+                                                    Text = j.StateName,
+                                                    Value = j.StateName
+                                                }).ToList();
+                SelectListItem select = new SelectListItem();
+                select.Text = "---select---";
+                select.Value = "";
+                state.Insert(0, select);
+                return state;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static string GetStateNameFromID(long id)
+        {
+            try
+            {
+                string Name = "";
+                var state = db.StateMasters.Where(i => i.IsDelete == false && i.StateID == id).ToList();
+
+                if (state.Count > 0)
+                {
+                    foreach (var items in state)
+                    {
+                        Name = items.StateName;
+                    }
+                }
+                return Name;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static long GetStateIDFromName(string statename)
+        {
+            try
+            {
+                long StateID = 0;
+                var state = db.StateMasters.Where(i => i.IsDelete == false && i.StateName == statename).ToList();
+                if (state.Count > 0)
+                {
+                    foreach (var items in state)
+                    {
+                        StateID = items.StateID;
+                    }
+                }
+                return StateID;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static long GetIDFromCityName(string cityname)
+        {
+            try
+            {
+                long CityID = 0;
+
+                var CitID = db.CityMasters.Where(i => i.IsDelete == false && i.CityName == cityname).ToList();
+
+                if (CitID.Count > 0)
+                {
+                    foreach (var ID in CitID)
+                    {
+                        CityID = ID.CityID;
+                    }
+                }
+                else
+                {
+                    CityID = 0;
+                }
+
+                return CityID;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public static string GetCityNamefromID(long ID)
+        {
+            try
+            {
+                string Name = "";
+                var cityName = db.CityMasters.Where(i => i.IsDelete == false && i.CityID == ID).ToList();
+
+                if (cityName.Count > 0)
+                {
+                    foreach (var name in cityName)
+                    {
+                        Name = name.CityName;
+                    }
+                }
+                return Name;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public static List<SelectListItem> GetCities()
+        {
+            try
+            {
+                var city = (from i in db.CityMasters
+                            where i.IsDelete == false
+                            select new
+                            {
+                                StateID = i.StateID,
+                                CityName = i.CityName,
+                                StateName = i.CityDescription,
+                                IsDelete = i.IsDelete
+
+                            }).Select(j => new SelectListItem()
+                            {
+                                Value = j.CityName,
+                                Text = j.CityName
+                            }).ToList();
+
+                SelectListItem select = new SelectListItem();
+                select.Value = "";
+                select.Text = "---select---";
+                city.Insert(0, select);
+
+                return city;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion city
+        #region skillset
+        public static List<SkillSetModel> GetAllSkillSet()
+        {
+            try
+            {
+                List<SkillSetModel> skill = (from i in db.SkillSetMasters
+                                              where i.IsDelete == false
+                                              select new
+                                              {
+                                                  SkillSetID = i.SkillSetID,
+                                                  SkillSetName = i.SkillSetName,
+                                                  SkillSetDescription = i.SkillSetDescription,
+                                                  IsDelete = i.IsDelete
+                                              }).Select(j => new SkillSetModel()
+                                              {
+                                                  SkillSetID = j.SkillSetID,
+                                                  SkillSetName = j.SkillSetName,
+                                                  SkillSetDescription = j.SkillSetDescription,
+                                                  IsDelete = j.IsDelete
+
+                                              }).ToList();
+                return skill;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+        public static List<SkillSetModel> GetSkillSet(long id)
+        {
+            try
+            {
+                List<SkillSetModel> skill = (from i in db.SkillSetMasters
+                                             where i.IsDelete == false && i.SkillSetID == id
+                                             select new
+                                             {
+                                                 SkillSetID = i.SkillSetID,
+                                                 SkillSetName = i.SkillSetName,
+                                                 SkillSetDescription = i.SkillSetDescription,
+                                                 IsDelete = i.IsDelete
+                                             }).Select(j => new SkillSetModel()
+                                             {
+                                                 SkillSetID = j.SkillSetID,
+                                                 SkillSetName = j.SkillSetName,
+                                                 SkillSetDescription = j.SkillSetDescription,
+                                                 IsDelete = j.IsDelete
+
+                                             }).ToList();
+                return skill;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+        public static void AddSkillSet(SkillSetModel skillset)
+        {
+            try
+            {
+                SkillSetMaster skill = new SkillSetMaster();
+                skill.SkillSetName = skillset.SkillSetName;
+                skill.SkillSetDescription = skillset.SkillSetDescription;
+                skill.IsDelete = false;
+
+                db.SkillSetMasters.Add(skill);
+                db.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static void UpdateSkillSet(SkillSetModel skillset)
+        {
+            try
+            {
+                var skill = db.SkillSetMasters.Where(i => i.IsDelete == false && i.SkillSetID == skillset.SkillSetID).ToList();
+
+                if (skill.Count > 0)
+                {
+                    foreach (var items in skill)
+                    {
+                        items.SkillSetName = skillset.SkillSetName;
+                        items.SkillSetDescription = skillset.SkillSetDescription;
+                        items.IsDelete = skillset.IsDelete;
+
+                        db.SaveChanges();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static void DeleteSkillSet(long id)
+        {
+            try
+            {
+                var skill = db.SkillSetMasters.Where(i => i.IsDelete == false && i.SkillSetID == id).ToList();
+
+                if (skill.Count > 0)
+                {
+                    foreach (var items in skill)
+                    {
+                        items.IsDelete = true;
+
+                        db.SaveChanges();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion skillset
+        #region EmployeeDetails
+        public static List<EmployeeDetailModel> GetAllEmployees()
+        {
+            try
+            {
+                List<EmployeeDetailModel> employee = (from i in db.EmployeeDetails
+                                                       where i.IsDelete == false
+                                                       select new
+                                                       {
+                                                           RegistrationID = i.RegistrationID,
+                                                           UserName = i.UserName,
+                                                           PassWord = i.PassWord,                                                           
+                                                           CountryID = i.CountryID,
+                                                           StateID = i.StateID,
+                                                           CityID = i.CityID,
+                                                           SkillSetName = i.SkillSetName,
+                                                           DateOfBirth = i.DateOfBirth,
+                                                           Sex = i.Sex,
+                                                           MobileNo = i.MobileNo,
+                                                           EmailID = i.EmailID,
+                                                           CurrentStatus = i.CurrentStatus,
+                                                           Description = i.Description,
+                                                           Attachment = i.Attachment,
+                                                           ImageName = i.ImageName,
+                                                           IsDelete = i.IsDelete
+                                                       }).Select(j => new EmployeeDetailModel()
+                                                       {
+                                                           RegistrationID = j.RegistrationID,
+                                                           UserName = j.UserName,
+                                                           PassWord = j.PassWord,                                                           
+                                                           CountryID = j.CountryID,
+                                                           StateID = j.StateID,
+                                                           CityID = j.CityID,
+                                                           SkillSetName = j.SkillSetName,
+                                                           DateOfBirth = j.DateOfBirth,
+                                                           Sex = j.Sex,
+                                                           MobileNo = j.MobileNo,
+                                                           EmailID = j.EmailID,
+                                                           CurrentStatus = j.CurrentStatus,
+                                                           Description = j.Description,
+                                                           Attachment = j.Attachment,
+                                                           ImageName = j.ImageName,
+                                                           IsDelete = j.IsDelete
+
+                                                       }).ToList();
+
+                return employee;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static void AddEmployee(EmployeeDetailModel employee)
+        {
+            try
+            {
+
+                EmployeeDetail emp = new EmployeeDetail();
+                emp.UserName = employee.UserName;
+                emp.PassWord = employee.PassWord;                
+                emp.CountryID = employee.CountryID;
+                emp.StateID = employee.StateID;
+                emp.CityID = employee.CityID;
+                emp.SkillSetName = employee.SkillSetName;
+                emp.DateOfBirth = employee.DateOfBirth;
+                emp.Sex = employee.Sex;
+                emp.MobileNo = employee.MobileNo;
+                emp.EmailID = employee.EmailID;
+                emp.CurrentStatus = employee.CurrentStatus;
+                emp.Description = employee.Description;
+                emp.Attachment = employee.Attachment;
+                emp.ImageName = employee.ImageName;
+                emp.IsDelete = false;
+
+                db.EmployeeDetails.Add(emp);
+                db.SaveChanges();
+
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static List<EmployeeDetailModel> GetEmployee(long id)
+        {
+            try
+            {
+                List<EmployeeDetailModel> employee = (from i in db.EmployeeDetails
+                                                       where i.IsDelete == false
+                                                       && i.RegistrationID == id
+                                                       select new
+                                                       {
+                                                           RegistrationID = i.RegistrationID,
+                                                           UserName = i.UserName,
+                                                           PassWord = i.PassWord,                                                           
+                                                           CountryID = i.CountryID,
+                                                           StateID = i.StateID,
+                                                           CityID = i.CityID,
+                                                           SkillSetName = i.SkillSetName,
+                                                           DateOfBirth = i.DateOfBirth,
+                                                           Sex = i.Sex,
+                                                           MobileNo = i.MobileNo,
+                                                           EmailID = i.EmailID,
+                                                           CurrentStatus = i.CurrentStatus,
+                                                           Description = i.Description,
+                                                           Attachment = i.Attachment,
+                                                           ImageName = i.ImageName,
+                                                           IsDelete = i.IsDelete
+
+                                                       }).Select(j => new EmployeeDetailModel()
+                                                       {
+                                                           RegistrationID = j.RegistrationID,
+                                                           UserName = j.UserName,
+                                                           PassWord = j.PassWord,                                                           
+                                                           CountryID = j.CountryID,
+                                                           StateID = j.StateID,
+                                                           CityID = j.CityID,
+                                                           SkillSetName = j.SkillSetName,
+                                                           DateOfBirth = j.DateOfBirth,
+                                                           Sex = j.Sex,
+                                                           MobileNo = j.MobileNo,
+                                                           EmailID = j.EmailID,
+                                                           CurrentStatus = j.CurrentStatus,
+                                                           Description = j.Description,
+                                                           Attachment = j.Attachment,
+                                                           ImageName = j.ImageName,
+                                                           IsDelete = j.IsDelete
+
+                                                       }).ToList();
+
+                return employee;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static void UpdateEmployee(EmployeeDetailModel employee)
+        {
+            try
+            {
+                var empl = db.EmployeeDetails.Where(i => i.IsDelete == false && i.RegistrationID == employee.RegistrationID).ToList();
+
+                if (empl.Count > 0)
+                {
+                    foreach (var emp in empl)
+                    {
+                        emp.UserName = employee.UserName;
+                        emp.PassWord = employee.PassWord;                        
+                        emp.CountryID = employee.CountryID;
+                        emp.StateID = employee.StateID;
+                        emp.CityID = employee.CityID;
+                        emp.SkillSetName = employee.SkillSetName;
+                        emp.DateOfBirth = employee.DateOfBirth;
+                        emp.Sex = employee.Sex;
+                        emp.MobileNo = employee.MobileNo;
+                        emp.EmailID = employee.EmailID;
+                        emp.CurrentStatus = employee.CurrentStatus;
+                        emp.Description = employee.Description;
+                        emp.Attachment = employee.Attachment;
+                        emp.ImageName = employee.ImageName;
+                        emp.IsDelete = employee.IsDelete;
+
+                        db.SaveChanges();
+
+                    }
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public static void DeleteEmployee(long id)
+        {
+            try
+            {
+                var empl = db.EmployeeDetails.Where(i => i.IsDelete == false && i.RegistrationID == id).ToList();
+
+                if (empl.Count > 0)
+                {
+                    foreach (var emp in empl)
+                    {
+
+                        emp.IsDelete = true;
+
+                        db.SaveChanges();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static List<SelectListItem> GetSkill()
+        {
+            try
+            {
+                List<SelectListItem> skillset = (from i in db.SkillSetMasters
+                                                 where i.IsDelete == false
+                                                 select new
+                                                 {
+                                                     SkillSetID = i.SkillSetID,
+                                                     SkillSetName = i.SkillSetName,
+                                                     SkillSetDescription = i.SkillSetDescription,
+                                                     IsDelete = i.IsDelete
+                                                 }).Select(j => new SelectListItem()
+                                                 {
+                                                     Text = j.SkillSetName,
+                                                     Value = j.SkillSetName
+                                                 }).ToList();
+
+
+                return skillset;
+
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static void UpdatePassWord(EmployeeDetailModel employee)
+        {
+            try
+            {
+                var emp = db.EmployeeDetails.Where(i => i.IsDelete == false && i.UserName == employee.UserName).ToList();
+                if (emp.Count > 0)
+                {
+                    foreach (var name in emp)
+                    {
+                        name.PassWord = employee.PassWord;
+
+                        db.SaveChanges();
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static long GetIDFromCountryName(string counname)
+        {
+            try
+            {
+                long CountryID = 0;
+
+                var CounID = db.CountryMasters.Where(i => i.IsDelete == false && i.CountryName == counname).ToList();
+
+                if (CounID.Count > 0)
+                {
+                    foreach (var ID in CounID)
+                    {
+                        CountryID = ID.CountryID;
+                    }
+                }
+                else
+                {
+                    CountryID = 0;
+                }
+
+                return CountryID;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public static List<StateModel> GetStateByCountryId(long Id)
+        {
+            try
+            {
+                List<StateModel> state = (from i in db.StateMasters
+                                          where i.IsDelete == false && i.CountryID == Id
+                                          select new
+                                          {
+                                              StateID = i.StateID,
+                                              CountryID = i.CountryID,
+                                              StateName = i.StateName,
+                                              StateDescription = i.StateDescription,
+                                              IsDelete = i.IsDelete
+
+                                          }).Select(j => new StateModel()
+                                          {
+                                              StateID = j.StateID,
+                                              CountryID = j.CountryID,
+                                              StateName = j.StateName,
+                                              StateDescription = j.StateDescription,
+                                              IsDelete = j.IsDelete
+
+                                          }).ToList();
+                return state;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static List<CityModel> GetCityByStateId(long Id)
+        {
+            try
+            {
+                List<CityModel> city = (from i in db.CityMasters
+                                        where i.IsDelete == false && i.StateID == Id
+                                        select new
+                                        {
+                                            CityID = i.CityID,
+                                            CityName = i.CityName,
+                                            StateID = i.StateID,
+                                            CityDescription = i.CityDescription,
+                                            IsDelete = i.IsDelete
+
+                                        }).Select(j => new CityModel()
+                                        {
+                                            CityID = j.CityID,
+                                            CityName = j.CityName,
+                                            StateID = j.StateID,
+                                            CityDescription = j.CityDescription,
+                                            IsDelete = j.IsDelete
+
+                                        }).ToList();
+                return city;
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public static long GetCityIDByState(string statename)
+        {
+            try
+            {
+                using (var _db = new Test3Entities())
+                {
+                    long CityID = 0;
+                    var CityId = _db.StateMasters.Where(i => i.IsDelete == false && i.StateName == statename).ToList();
+                    foreach (var name in CityId)
+                    {
+                        CityID = name.StateID;
+                    }
+                    return CityID;
+                }
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion EmployeeDetails
+    }
+}
