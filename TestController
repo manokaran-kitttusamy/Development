@@ -1,0 +1,767 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Data;
+using System.Data.SqlClient;
+using System.ComponentModel.DataAnnotations;
+using Test3.DAL;
+using Test3.Models;
+using Test3.Test3DataObjects;
+using System.IO;
+
+namespace Test3.Controllers
+{
+    public class Test3Controller : Controller
+    {
+        //
+        // GET: /Test3/
+        public ActionResult Index()
+        {
+            return View();
+        }
+        #region country
+        public ActionResult Country()
+        {
+            try
+            {
+                List<CountryModel> country = new List<CountryModel>();
+                country = Test3Data.GetAllCountry();
+                return View(country);
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult Country(CountryModel country)
+        {
+            try
+            {
+                Test3Data.AddCountry(country);
+                return RedirectToAction("Country");
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateCountry(long id)
+        {
+            try
+            {
+                List<CountryModel> country = new List<CountryModel>();
+                country = Test3Data.GetCountry(id);
+                return View(country);
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateCountry(CountryModel country)
+        {
+            try
+            {
+                Test3Data.UpdateCountry(country);
+                return RedirectToAction("Country");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult DeleteCountry(long id)
+        {
+            try
+            {
+                Test3Data.DeleteCountry(id);
+                return RedirectToAction("Country");
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        #endregion country
+        #region state
+        public ActionResult State()
+        {
+            try
+            {
+                ViewBag.Country = Test3Data.DrpCountry();
+
+                List<StateModel> state = new List<StateModel>();
+                state = Test3Data.GetAllState();
+                if (state.Count > 0)
+                {
+                    foreach (var items in state)
+                    {
+                        items.CountryName = Test3Data.GetCountryNameFromID(items.CountryID);
+                    }
+                }
+                return View(state);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult State(StateModel state)
+        {
+            try
+            {
+                ViewBag.Country = Test3Data.DrpCountry();
+
+                long CountryID = Test3Data.GetCountrtyIDFromName(state.CountryName);
+                state.CountryID = CountryID;
+
+                Test3Data.AddState(state);
+                return RedirectToAction("State");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateState(long id)
+        {
+            try
+            {
+                ViewBag.Country = Test3Data.DrpCountry();
+
+
+                List<StateModel> state = new List<StateModel>();
+                state = Test3Data.GetState(id);
+                if (state.Count > 0)
+                {
+                    foreach (var items in state)
+                    {
+                        items.CountryName = Test3Data.GetCountryNameFromID(items.CountryID);
+                    }
+                }
+                return View(state);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateState(StateModel state)
+        {
+            try
+            {
+
+                ViewBag.Country = Test3Data.DrpCountry();
+
+                long CountryID = Test3Data.GetCountrtyIDFromName(state.CountryName);
+                state.CountryID = CountryID;
+
+                Test3Data.UpdateState(state);
+                return RedirectToAction("State");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult DeleteState(long id)
+        {
+            try
+            {
+                Test3Data.DeleteState(id);
+                return RedirectToAction("State");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion state
+        #region city
+        public ActionResult city()
+        {
+            try
+            {
+                ViewBag.State = Test3Data.DrpState();
+
+                List<CityModel> city = new List<CityModel>();
+                city = Test3Data.GetAllCity();
+                if (city.Count > 0)
+                {
+                    foreach (var items in city)
+                    {
+                        items.StateName = Test3Data.GetStateNameFromID(items.StateID);
+                    }
+                }
+                return View(city);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult city(CityModel city)
+        {
+            try
+            {
+                ViewBag.State = Test3Data.DrpState();
+
+                long StateID = Test3Data.GetStateIDFromName(city.StateName);
+                city.StateID = StateID;
+
+                Test3Data.AddCity(city);
+                return RedirectToAction("city");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateCity(long id)
+        {
+            try
+            {
+                ViewBag.State = Test3Data.DrpState();
+
+                List<CityModel> city = new List<CityModel>();
+                city = Test3Data.GetCity(id);
+                if (city.Count > 0)
+                {
+                    foreach (var items in city)
+                    {
+                        items.StateName = Test3Data.GetStateNameFromID(items.StateID);
+                    }
+                }
+                return View(city);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateCity(CityModel city)
+        {
+            try
+            {
+
+                ViewBag.State = Test3Data.DrpState();
+
+                long StateID = Test3Data.GetStateIDFromName(city.StateName);
+                city.StateID = StateID;
+
+                Test3Data.UpdateCity(city);
+                return RedirectToAction("city");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult DeleteCity(long id)
+        {
+            try
+            {
+                Test3Data.DeleteCity(id);
+                return RedirectToAction("city");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion city
+        #region skillset
+        public ActionResult SkillSet()
+        {
+            try
+            {
+                List<SkillSetModel> skillset = new List<SkillSetModel>();
+                skillset = Test3Data.GetAllSkillSet();
+                return View(skillset);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult SkillSet(SkillSetModel skillset)
+        {
+            try
+            {
+                Test3Data.AddSkillSet(skillset);
+                return RedirectToAction("SkillSet");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult UpdateSkillSet(long id)
+        {
+            try
+            {
+                List<SkillSetModel> skillset = new List<SkillSetModel>();
+                skillset = Test3Data.GetSkillSet(id);
+                return View(skillset);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateSkillSet(SkillSetModel skillset)
+        {
+            try
+            {
+                Test3Data.UpdateSkillSet(skillset);
+                return RedirectToAction("SkillSet");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+
+        public ActionResult DeleteSkillSet(long id)
+        {
+            try
+            {
+                Test3Data.DeleteSkillSet(id);
+                return RedirectToAction("SkillSet");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion skillset
+        #region EmployeeDetails
+        public ActionResult EmployeeDetails()
+        {
+            try
+            {
+
+                ViewBag.Country = Test3Data.DrpCountry();
+                ViewBag.State = Test3Data.DrpState();
+                ViewBag.City = Test3Data.GetCities();
+                ViewBag.Skillset = Test3Data.GetSkill();
+                List<EmployeeDetailModel> employee = new List<EmployeeDetailModel>();
+                employee = Test3Data.GetAllEmployees();
+                if (employee.Count > 0)
+                {
+                    foreach (var items in employee)
+                    {
+
+                        items.CountryName = Test3Data.GetCountryNameFromID(items.CountryID);
+                        items.StateName = Test3Data.GetStateNameFromID(items.StateID);
+                        items.CityName = Test3Data.GetCityNamefromID(items.CityID);
+                    }
+                }
+                return View(employee);
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+        [HttpPost]
+        public ActionResult EmployeeDetails(EmployeeDetailModel employee, string[] SkillSetName, HttpPostedFileBase ImagePath)
+        {
+            try
+            {
+
+                string Skill = string.Join(",", SkillSetName);
+                employee.SkillSetName = Skill;
+
+                ViewBag.Country = Test3Data.DrpCountry();
+                ViewBag.State = Test3Data.DrpState();
+                ViewBag.City = Test3Data.GetCities();
+                ViewBag.Skillset = Test3Data.GetSkill();
+
+                string fileName = Path.GetFileName(ImagePath.FileName);
+                string paths = Server.MapPath("~/Uploads/");
+
+                if (!Directory.Exists(paths))
+                {
+                    Directory.CreateDirectory(paths);
+                }
+
+                paths = "~/Uploads/" + fileName;
+
+                ImagePath.SaveAs(Server.MapPath(paths));
+
+                employee.ImageName = fileName;
+                employee.Attachment = paths;
+
+                long CountryID = Test3Data.GetCountrtyIDFromName(employee.CountryName);
+                employee.CountryID = CountryID;
+                long StateID = Test3Data.GetStateIDFromName(employee.StateName);
+                employee.StateID = StateID;
+                long CityID = Test3Data.GetIDFromCityName(employee.CityName);
+                employee.CityID = CityID;
+
+
+                using (Test3Entities db = new Test3Entities())
+                {
+                    var username = db.EmployeeDetails.Where(i => i.UserName == employee.UserName && i.IsDelete == false).FirstOrDefault();
+
+                    if (username == null)
+                    {
+                        Test3Data.AddEmployee(employee);
+                        ModelState.Clear();
+                        return RedirectToAction("EmployeeDetails");
+                    }
+                    else
+                    {
+                        employee.LoginErrorMessage = "username is existed";
+                        return RedirectToAction("EmployeeLogin");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+
+        public ActionResult UpdateEmployeeDetails(long id)
+        {
+            try
+            {
+                ViewBag.Country = Test3Data.DrpCountry();
+                ViewBag.State = Test3Data.DrpState();
+                ViewBag.City = Test3Data.GetCities();
+                ViewBag.Skillset = Test3Data.GetSkill();
+                List<EmployeeDetailModel> employee = new List<EmployeeDetailModel>();
+                employee = Test3Data.GetEmployee(id);
+                if (employee.Count > 0)
+                {
+                    foreach (var items in employee)
+                    {
+                        
+                        items.CountryName = Test3Data.GetCountryNameFromID(items.CountryID);
+                        items.StateName = Test3Data.GetStateNameFromID(items.StateID);
+                        items.CityName = Test3Data.GetCityNamefromID(items.CityID);
+                    }
+                }
+                return View(employee);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+
+        public ActionResult UpdateEmployeeDetails(EmployeeDetailModel employee, string[] SkillSetName, HttpPostedFileBase ImagePath)
+        {
+            try
+            {
+
+                string Skill = string.Join(",", SkillSetName);
+                employee.SkillSetName = Skill;
+
+                ViewBag.Country = Test3Data.DrpCountry();
+                ViewBag.State = Test3Data.DrpState();
+                ViewBag.City = Test3Data.GetCities();
+                ViewBag.Skillset = Test3Data.GetSkill();
+
+                string fileName = Path.GetFileName(ImagePath.FileName);
+                string paths = Server.MapPath("~/Uploads/");
+
+                if (!Directory.Exists(paths))
+                {
+                    Directory.CreateDirectory(paths);
+                }
+
+                paths = "~/Uploads/" + fileName;
+
+                ImagePath.SaveAs(Server.MapPath(paths));
+
+                employee.ImageName = fileName;
+                employee.Attachment = paths;
+
+                long CountryID = Test3Data.GetCountrtyIDFromName(employee.CountryName);
+                employee.CountryID = CountryID;
+                long StateID = Test3Data.GetStateIDFromName(employee.StateName);
+                employee.StateID = StateID;
+                long CityID = Test3Data.GetIDFromCityName(employee.CityName);
+                employee.CityID = CityID;
+
+                Test3Data.UpdateEmployee(employee);
+                ModelState.Clear();
+                return RedirectToAction("EmployeeDetails");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+        public ActionResult DeleteEmployeeDetails(long id)
+        {
+            try
+            {
+                Test3Data.DeleteEmployee(id);
+                return RedirectToAction("EmployeeDetails");
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+        public JsonResult LoadStateBasedonCountry(string Id)
+        {
+
+            long CountryID = Test3Data.GetIDFromCountryName(Id);
+            List<StateModel> state = new List<StateModel>();
+            state = Test3Data.GetStateByCountryId(CountryID);
+            return Json(state, JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetCity(string Id)
+        {
+
+            long CityID = Test3Data.GetCityIDByState(Id);
+            List<CityModel> city = new List<CityModel>();
+            city = Test3Data.GetCityByStateId(CityID);
+            return Json(city, JsonRequestBehavior.AllowGet);
+        }
+
+        #endregion EmployeeDetails
+        #region EmployeeLogin
+        public ActionResult EmployeeLogin()
+        {
+            try
+            {
+                return View();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult EmployeeLogin(EmployeeDetailModel employee)
+        {
+            using (Test3Entities db = new Test3Entities())
+                try
+                {
+
+                    var userdetails = db.EmployeeDetails.Where(i => i.UserName == employee.UserName && i.PassWord == employee.PassWord).FirstOrDefault();
+
+                    if (userdetails == null)
+                    {
+                        employee.LoginErrorMessage = "wrong username and password";
+                        return RedirectToAction("EmployeeLogin");
+                    }
+                    else
+                    {
+                        Session["EmployeeID"] = employee.RegistrationID;
+                        Session["UserName"] = employee.UserName;
+                        return RedirectToAction("EmployeeDetails");
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                    throw ex;
+                }
+        }
+
+        public ActionResult NewEmployee()
+        {
+            try
+            {
+
+                ViewBag.Country = Test3Data.DrpCountry();
+                ViewBag.State = Test3Data.DrpState();
+                ViewBag.City = Test3Data.GetCities();
+                ViewBag.Skillset = Test3Data.GetSkill();
+                List<EmployeeDetailModel> employee = new List<EmployeeDetailModel>();
+                employee = Test3Data.GetAllEmployees();
+                if (employee.Count > 0)
+                {
+                    foreach (var items in employee)
+                    {
+
+                        items.CountryName = Test3Data.GetCountryNameFromID(items.CountryID);
+                        items.StateName = Test3Data.GetStateNameFromID(items.StateID);
+                        items.CityName = Test3Data.GetCityNamefromID(items.CityID);
+                    }
+                }
+                return View(employee);
+
+
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+
+        }
+        [HttpPost]
+        public ActionResult NewEmployee(EmployeeDetailModel employee, string[] SkillSetName, HttpPostedFileBase ImagePath)
+        {
+            try
+            {
+                string Skill = string.Join(",", SkillSetName);
+                employee.SkillSetName = Skill;
+
+                ViewBag.Country = Test3Data.DrpCountry();
+                ViewBag.State = Test3Data.DrpState();
+                ViewBag.City = Test3Data.GetCities();
+                ViewBag.Skillset = Test3Data.GetSkill();
+
+                string fileName = Path.GetFileName(ImagePath.FileName);
+                string paths = Server.MapPath("~/Uploads/");
+
+                if (!Directory.Exists(paths))
+                {
+                    Directory.CreateDirectory(paths);
+                }
+
+                paths = "~/Uploads/" + fileName;
+
+                ImagePath.SaveAs(Server.MapPath(paths));
+
+                employee.ImageName = fileName;
+                employee.Attachment = paths;
+
+                long CountryID = Test3Data.GetCountrtyIDFromName(employee.CountryName);
+                employee.CountryID = CountryID;
+                long StateID = Test3Data.GetStateIDFromName(employee.StateName);
+                employee.StateID = StateID;
+                long CityID = Test3Data.GetIDFromCityName(employee.CityName);
+                employee.CityID = CityID;
+
+
+                using (Test3Entities db = new Test3Entities())
+                {
+                    var username = db.EmployeeDetails.Where(i => i.UserName == employee.UserName && i.IsDelete == false).FirstOrDefault();
+
+                    if (username == null)
+                    {
+                        Test3Data.AddEmployee(employee);
+                        ModelState.Clear();
+                        return RedirectToAction("EmployeeDetails");
+                    }
+                    else
+                    {
+                        employee.LoginErrorMessage = "username is existed";
+                        return RedirectToAction("EmployeeLogin");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion EmployeeLogin
+        #region employeelogout
+        public ActionResult EmployeeLogout()
+        {
+            try
+            {
+                Session.Abandon();
+                return RedirectToAction("EmployeeLogin");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion employeelogout
+        #region forgetpassword
+        public ActionResult ForgotPassWord()
+        {
+            try
+            {
+                return View();
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult ForgotPassWord(EmployeeDetailModel employee)
+        {
+            try
+            {
+                using (Test3Entities _db = new Test3Entities())
+                {
+                    var username = _db.EmployeeDetails.Where(i => i.UserName == employee.UserName && i.IsDelete == false).FirstOrDefault();
+                    if (username == null)
+                    {
+                        return RedirectToAction("ForgotPassWord");
+                    }
+                    else
+                    {
+                        Test3Data.UpdatePassWord(employee);
+                        return RedirectToAction("EmployeeLogin");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        #endregion forgetpassword
+    }
+}
