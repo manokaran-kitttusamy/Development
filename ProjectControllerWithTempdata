@@ -1,0 +1,471 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using System.Data;
+using System.Data.SqlClient;
+using System.ComponentModel.DataAnnotations;
+using ProjectManagement.DAL;
+using ProjectManagement.Models;
+using ProjectManagement.ProjectManagementDataObjects;
+using System.IO;
+using System.Text;
+
+namespace ProjectManagement.Controllers
+{
+    public class ProjectManagementController : Controller
+    {
+        public ActionResult Index()
+        {
+            return View();
+        }
+        public ActionResult Project()
+        {
+
+            ViewBag.Message = "";
+            List<ProjectModel> proj = new List<ProjectModel>();
+            proj = ProjectManagementData.GetAllProject();
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"]; 
+            }
+            return View(proj);
+        }
+        [HttpPost]
+        public ActionResult Project(ProjectModel Project)
+        {
+            ProjectManagementData.AddProject(Project);
+            ModelState.Clear();
+
+            //List<ProjectModel> proj = new List<ProjectModel>();
+            //proj = ProjectManagementData.GetAllProject();
+            TempData["Message"] = "Project Saved Successfully";
+            return Redirect("/ProjectManagement/Project");
+        }
+        public ActionResult UpdateProject(long Id)
+        {
+            try
+            {
+                List<ProjectModel> proj = new List<ProjectModel>();
+                 proj = ProjectManagementData.GetProject(Id);
+                return View(proj);
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateProject(ProjectModel Project)
+        {
+            try
+            {
+                ProjectManagementData.UpdateProject(Project);
+                TempData["Message"] = "Project Updated Successfully";
+                return RedirectToAction("Project");
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        public ActionResult DeleteProject(long Id)
+        {
+            try
+            {
+                ProjectManagementData.DeleteProject(Id);
+                TempData["Message"] = "Project Deleted Successfully";
+                return RedirectToAction("Project");
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+        public ActionResult Module()
+        {
+
+            ViewBag.Message = "";
+            ViewBag.Project = ProjectManagementData.GetProject();
+            List<ModuleModel> mod = new List<ModuleModel>();
+
+            mod = ProjectManagementData.GetAllModule();
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+
+            if(mod.Count>0)
+            {
+                foreach(var name in mod)
+                {
+                    name.ProjectName = ProjectManagementData.GetprojectNamefromID(name.ProjectID);
+                }
+            }
+
+
+
+            return View(mod);
+        }
+        [HttpPost]
+        public ActionResult Module(ModuleModel Module)
+        {
+            Int32 projectId = ProjectManagementData.GetIDFromProjectName(Module.ProjectName);
+            Module.ProjectID = projectId;
+
+            ViewBag.Project = ProjectManagementData.GetProject();
+            ProjectManagementData.AddModule(Module);
+            TempData["Message"] = "Module Saved Successfully";
+            return Redirect("Module");
+        }
+        public ActionResult UpdateModule(long Id)
+        {
+            try
+            {
+                ViewBag.Project = ProjectManagementData.GetProject();
+                List<ModuleModel> mod = new List<ModuleModel>();
+                mod = ProjectManagementData.GetModule(Id);
+                if (mod.Count > 0)
+                {
+                    foreach (var name in mod)
+                    {
+                        name.ProjectName = ProjectManagementData.GetprojectNamefromID(name.ProjectID);
+                    }
+                }
+                return View(mod);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateModule(ModuleModel Module)
+        {
+            try
+            {
+                Int32 projectId = ProjectManagementData.GetIDFromProjectName(Module.ProjectName);
+                Module.ProjectID = projectId;
+
+                ViewBag.Project = ProjectManagementData.GetProject();
+                ProjectManagementData.UpdateModule(Module);
+                TempData["Message"] = "Module Updated Successfully";
+                return RedirectToAction("Module");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public ActionResult DeleteModule(long Id)
+        {
+            try
+            {
+                ProjectManagementData.DeleteModule(Id);
+                TempData["Message"] = "Module Deleted Successfully";
+                return RedirectToAction("Module");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public ActionResult ProjectStatus()
+        {
+            ViewBag.Message = "";
+            List<ProjectStatusModel> ps = new List<ProjectStatusModel>();
+            ps = ProjectManagementData.GetAllProjectStatus();
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+
+            return View(ps);
+        }
+        [HttpPost]
+        public ActionResult ProjectStatus(ProjectStatusModel ProjectStatus)
+        {
+            ProjectManagementData.AddProjectStatus(ProjectStatus);
+            TempData["Message"] = "ProjectStatus Saved Successfully";
+            return Redirect("ProjectStatus");
+        }
+        public ActionResult UpdateProjectStatus(long Id)
+        {
+            try
+            {
+                
+                List<ProjectStatusModel> ps = new List<ProjectStatusModel>();
+                ps = ProjectManagementData.GetProjectStatus(Id);
+                return View(ps);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateProjectStatus(ProjectStatusModel ProjectStatus)
+        {
+            try
+            {                
+                ProjectManagementData.UpdateProjectStatus(ProjectStatus);
+                TempData["Message"] = "ProjectStatus Updated Successfully";
+                return RedirectToAction("ProjectStatus");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public ActionResult DeleteProjectStatus(long Id)
+        {
+            try
+            {
+                ProjectManagementData.DeleteProjectStatus(Id);
+                TempData["Message"] = "ProjectStatus Deleted Successfully";
+                return RedirectToAction("ProjectStatus");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public ActionResult Technology()
+        {
+            ViewBag.Message = "";
+            List<TechnologyModel> Tech = new List<TechnologyModel>();
+            Tech = ProjectManagementData.GetAllTechnology();
+            if (TempData["Message"] != null)
+            {
+                ViewBag.Message = TempData["Message"];
+            }
+            return View(Tech);
+        }
+        [HttpPost]
+        public ActionResult Technology(TechnologyModel Technology)
+        {
+            ProjectManagementData.AddTechnology(Technology);
+            TempData["Message"] = "Technology Saved Successfully";
+            return Redirect("Technology");
+        }
+        public ActionResult UpdateTechnology(long Id)
+        {
+            try
+            {
+                
+                List<TechnologyModel> ps = new List<TechnologyModel>();
+                ps = ProjectManagementData.GetTechnology(Id);
+                return View(ps);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateTechnology(TechnologyModel Technology)
+        {
+            try
+            {
+                
+                ProjectManagementData.UpdateTechnology(Technology);
+                TempData["Message"] = "Technology Updated Successfully";
+                return RedirectToAction("Technology");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public ActionResult DeleteTechnology(long Id)
+        {
+            try
+            {
+                ProjectManagementData.DeleteTechnology(Id);
+                TempData["Message"] = "Technology Deleted Successfully";
+                return RedirectToAction("Technology");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public ActionResult ProjectDetails()
+        {
+            ViewBag.Message = "";
+            ViewBag.Project = ProjectManagementData.GetProject();
+            ViewBag.Module = ProjectManagementData.GetModule();
+            ViewBag.ProjectStatus = ProjectManagementData.GetProjectStatus();
+            ViewBag.TechnolgyName = ProjectManagementData.Technology();
+            List<ProjectDetailsModel> ProjDet = new List<ProjectDetailsModel>();              
+            ProjDet = ProjectManagementData.GetAllProjectDetails();
+            if (TempData["Message"] != null)
+            { 
+            ViewBag.Message = TempData["Message"];
+            }
+            if (ProjDet.Count > 0)
+            {
+                foreach (var name in ProjDet)
+                {
+
+                    name.ProjectName = ProjectManagementData.GetprojectNamefromID(name.ProjectID);
+                    name.ModuleName = ProjectManagementData.GetModuleNamefromID(name.ModuleID);
+                    name.ProjectStatusName = ProjectManagementData.GetProjectStatusNamefromID(name.ProjectStatusID);
+                    
+                }
+            }
+                        
+            return View(ProjDet);
+        }
+        [HttpPost]
+        public ActionResult ProjectDetails(ProjectDetailsModel ProjectDetails,string[] TechnologyName)
+        {
+
+            string techs = string.Join(",", TechnologyName);
+
+
+            ProjectDetails.TechnologyName = techs;           
+
+            Int32 ProjectID = ProjectManagementData.GetIDFromProjectName(ProjectDetails.ProjectName);
+            ProjectDetails.ProjectID = ProjectID;
+
+            Int32 ModuleID = ProjectManagementData.GetIDFromModuleName(ProjectDetails.ModuleName);
+            ProjectDetails.ModuleID = ModuleID;
+
+            Int32 ProjectStatusID = ProjectManagementData.GetIDFromProjectStatusName(ProjectDetails.ProjectStatusName);
+            ProjectDetails.ProjectStatusID = ProjectStatusID;
+
+
+            ViewBag.Project = ProjectManagementData.GetProject();
+            ViewBag.Module = ProjectManagementData.GetModule();
+            ViewBag.ProjectStatus = ProjectManagementData.GetProjectStatus();
+            ViewBag.TechnolgyName = ProjectManagementData.Technology();
+            
+            List<ProjectDetailsModel> projdet = new List<ProjectDetailsModel>();
+            ProjectManagementData.AddProjectDetails(ProjectDetails);
+            TempData["Message"] = "ProjectDetails Saved Successfully";
+            
+            return Redirect("ProjectDetails");
+        }
+        public ActionResult UpdateProjectDetails(long Id)
+        {
+            try
+            {
+
+           
+                ViewBag.Project = ProjectManagementData.GetProject();
+                ViewBag.Module = ProjectManagementData.GetModule();
+                ViewBag.ProjectStatus = ProjectManagementData.GetProjectStatus();
+                ViewBag.TechnolgyName = ProjectManagementData.Technology();
+                List<ProjectDetailsModel> ps = new List<ProjectDetailsModel>();
+
+                ps = ProjectManagementData.GetProjectDetails(Id);
+                if (ps.Count > 0)
+                {
+                    foreach (var name in ps)
+                    {
+
+                        name.ProjectName = ProjectManagementData.GetprojectNamefromID(name.ProjectID);
+                        name.ModuleName = ProjectManagementData.GetModuleNamefromID(name.ModuleID);
+                        name.ProjectStatusName = ProjectManagementData.GetProjectStatusNamefromID(name.ProjectStatusID);
+                    }
+                }
+                return View(ps);
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        [HttpPost]
+        public ActionResult UpdateProjectDetails(ProjectDetailsModel ProjectDetails, string[] TechnologyName)
+        {
+            try
+            {
+                string techs = string.Join(",", TechnologyName);
+
+
+                ProjectDetails.TechnologyName = techs;          
+
+                Int32 ProjectID = ProjectManagementData.GetIDFromProjectName(ProjectDetails.ProjectName);
+                ProjectDetails.ProjectID = ProjectID;
+
+                Int32 ModuleID = ProjectManagementData.GetIDFromModuleName(ProjectDetails.ModuleName);
+                ProjectDetails.ModuleID = ModuleID;
+
+                Int32 ProjectStatusID = ProjectManagementData.GetIDFromProjectStatusName(ProjectDetails.ProjectStatusName);
+                ProjectDetails.ProjectStatusID = ProjectStatusID;
+
+                ViewBag.Project = ProjectManagementData.GetProject();
+                ViewBag.Module = ProjectManagementData.GetModule();
+                ViewBag.ProjectStatus = ProjectManagementData.GetProjectStatus();
+                ViewBag.TechnolgyName = ProjectManagementData.Technology();
+                ProjectManagementData.UpdateProjectDetails(ProjectDetails);
+                TempData["Message"] = "ProjectDetails Updated Successfully";
+                return RedirectToAction("ProjectDetails");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public ActionResult DeleteProjectDetails(long Id)
+        {
+            try
+            {
+                ProjectManagementData.DeleteProjectDetails(Id);
+                TempData["Message"] = "ProjectDetails Deleted Successfully";
+                return RedirectToAction("ProjectDetails");
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
+        public ActionResult DetailsProjectDetails(long Id)
+        {
+            try
+            {
+                     ViewBag.Project = ProjectManagementData.GetProject();
+                ViewBag.Module = ProjectManagementData.GetModule();
+                ViewBag.ProjectStatus = ProjectManagementData.GetProjectStatus();
+                ViewBag.TechnolgyName = ProjectManagementData.Technology();
+                List<ProjectDetailsModel> ps = new List<ProjectDetailsModel>();
+
+                ps = ProjectManagementData.GetProjectDetails(Id);
+                if (ps.Count > 0)
+                {
+                    foreach (var name in ps)
+                    {
+
+                        name.ProjectName = ProjectManagementData.GetprojectNamefromID(name.ProjectID);
+                        name.ModuleName = ProjectManagementData.GetModuleNamefromID(name.ModuleID);
+                        name.ProjectStatusName = ProjectManagementData.GetProjectStatusNamefromID(name.ProjectStatusID);
+                    }
+                }
+                return View(ps);
+            }
+            catch (Exception ex)
+            {
+                
+                throw ex;
+            }
+        }
+    }
+}
