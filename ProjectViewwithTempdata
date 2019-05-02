@@ -1,0 +1,83 @@
+@model IEnumerable<ProjectManagement.Models.ProjectModel>
+
+@{
+    ViewBag.Title = "Project";
+}
+
+<h2>Project</h2>
+@Html.ActionLink("AddModule", "Module", new { })<br/>
+@Html.ActionLink("AddProjectStatus", "ProjectStatus", new { })<br/>
+@Html.ActionLink("AddTechnology", "Technology", new { })<br/>
+@Html.ActionLink("AddProjectDetails", "ProjectDetails", new { })<br />
+<br/>
+<br/>
+@using (Html.BeginForm("Project", "ProjectManagement", FormMethod.Post, new { @name = "proj", @onsubmit = "return validateForm()", @id = "project_form" }))
+{
+    <label id="lblmessage" name="lblmessage" class="color">@ViewBag.Message</label> <br/><br/>
+    <table>
+        <tr>
+            <td>@Html.Label("ProjectName", new { @id = "lblProjname" })</td>
+            <td>@Html.TextBox("ProjectName","", new {@class = "form-control", @id = "txtProjname"})</td>            
+        </tr>
+        <tr>
+            <td>@Html.Label("ProjectDescription", new { @id = "lblprojdes" })</td>
+            <td>@Html.TextArea("ProjectDescription","", new { @id = "txtaprojdes" })</td>
+        </tr>
+        <tr>
+            <td>
+                <input type="submit" name="SaveProject" id="SaveProject" value="Submit" />
+                <input type="reset" name="ClearProject" id="ClearProject" value="Clear" />
+            </td>
+        </tr>
+    </table>
+
+}
+<div style="border-top: 2px solid #000; padding-top:20px;padding-bottom:20px;">
+    <table border="1">
+        <tr>            
+            <th>ProjectID</th>
+            <th>ProjectName</th>           
+            <th>ProjectDescription</th>
+            <th colspan="2">Action</th>
+        </tr>
+        @foreach (var items in Model)
+        {
+            <tr>                
+                <td>@items.ProjectID</td>
+                <td>@items.ProjectName</td>
+                <td>@items.ProjectDescription</td>
+                @*<td>@Html.ActionLink("Edit", "UpdateProject", new { @id = @items.ProjectID })</td>*@
+                <td>
+                    <a href="@Url.Action("UpdateProject", "ProjectManagement", new { id = items.ProjectID })">
+                        <img src="@Url.Content("~/Content/Images/editbutton-android_v1.png")" style="width:38px;height:38px;" />
+                    </a>                    
+                </td>
+                <td>
+                    <a href="@Url.Action("DeleteProject", "ProjectManagement", new { id = items.ProjectID })">
+                        <img src="@Url.Content("~/Content/Images/red-delete-button-png-1.png ")" style="width:38px;height:38px;" />
+                    </a>
+                </td>                
+                @*<td>@Html.ActionLink("Delete", "DeleteProject", new { @id = @items.ProjectID })</td>*@
+            </tr>
+        }
+
+    </table>
+</div>
+
+<script>
+    ////$(document).ready(function()
+    ////{
+    //    $("#txtProjname").val();
+    //    alert("Project Name Is Required");
+    ////});
+        function validateForm() {
+            var x = document.forms["proj"]["ProjectName"].value;
+            if (x == "") {
+                alert("Project Name Is Required");
+                return false;
+            }
+        }
+
+</script>
+
+
